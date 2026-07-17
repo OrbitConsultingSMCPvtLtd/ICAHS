@@ -6,10 +6,10 @@ import 'package:icahs_hwr/models/student_model.dart';
 import 'package:icahs_hwr/service/http_service.dart';
 
 class StudentController extends GetxController {
-  StudentController(this._http);
+  StudentController(this._http, this.authController);
 
   final HttpService _http;
-  final AuthController _authController = Get.find<AuthController>();
+  final AuthController authController;
 
   final RxList<StudentModel> students = <StudentModel>[].obs;
 
@@ -30,7 +30,7 @@ class StudentController extends GetxController {
   Future<void> loadInitialStudents(String batchId) async {
     isLoading.value = true;
     try {
-      var user = _authController.user!;
+      var user = authController.user!;
       offset = 0;
 
       var res = await _http.getRequest(
@@ -48,7 +48,6 @@ class StudentController extends GetxController {
         ),
       );
 
-      print(students.length);
     } catch (e) {
       printError(info: e.toString());
     } finally {

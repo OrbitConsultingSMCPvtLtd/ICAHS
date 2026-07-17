@@ -57,108 +57,8 @@ class _ReportListPageState extends State<ReportListPage> {
         },
         child: CustomScrollView(
           slivers: [
-            SliverAppBar(
-              automaticallyImplyLeading: false,
-              expandedHeight: 250,
-              pinned: true,
-              leading: IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: Icon(Icons.arrow_back_ios_new_rounded),
-              ),
-              backgroundColor: MyColorPalette.purple,
-              foregroundColor: MyColorPalette.white,
-              flexibleSpace: FlexibleSpaceBar(
-                centerTitle: true,
-                expandedTitleScale: 1,
-                background: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-
-                      colors: [
-                        Color.fromARGB(255, 83, 63, 255),
-                        Color.fromARGB(255, 96, 78, 255),
-                        Color.fromARGB(255, 126, 112, 255),
-                      ],
-                      stops: [0.0, 0.55, 1.0],
-                    ),
-                    // borderRadius: BorderRadius.all(Radius.circular(16)),
-                  ),
-                  child: Center(
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Positioned(
-                          right: -30,
-                          top: -20,
-                          child: IgnorePointer(
-                            child: Container(
-                              width: 270,
-                              height: 270,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: RadialGradient(
-                                  radius: 0.7,
-                                  colors: [
-                                    Color.fromARGB(80, 255, 255, 255),
-                                    Color.fromARGB(40, 255, 255, 255),
-                                    Color.fromARGB(15, 255, 255, 255),
-                                    Color.fromARGB(3, 255, 255, 255),
-                                    Colors.transparent,
-                                  ],
-                                  stops: [0.0, 0.4, 0.6, 0.7, 1.0],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 0,
-                          bottom: -10,
-                          child: IgnorePointer(
-                            child: Container(
-                              width: 110,
-                              height: 110,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: RadialGradient(
-                                  radius: 0.4,
-                                  colors: [
-                                    Color.fromARGB(80, 255, 255, 255),
-                                    Color.fromARGB(40, 255, 255, 255),
-                                    Color.fromARGB(15, 255, 255, 255),
-                                    Color.fromARGB(3, 255, 255, 255),
-                                    Colors.transparent,
-                                  ],
-                                  stops: [0.0, 0.4, 0.6, 0.7, 1.0],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        LottieBuilder.asset(
-                          'assets/gifs/clipboard.json',
-                          animate: true,
-                          height: 200,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                title: Text(
-                  "Behaviour Report",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: MyColorPalette.white,
-                  ),
-                ),
-              ),
-            ),
-            SliverFillRemaining(
-              fillOverscroll: true,
-              child: _buildReportsList(),
-            ),
+            _buildSliverAppBar(),
+            SliverFillRemaining(child: _buildReportsList()),
           ],
         ),
       ),
@@ -188,6 +88,107 @@ class _ReportListPageState extends State<ReportListPage> {
     );
   }
 
+  Widget _buildSliverAppBar() {
+    return SliverAppBar(
+      automaticallyImplyLeading: false,
+      expandedHeight: 230,
+      pinned: true,
+      leading: IconButton(
+        onPressed: () => Navigator.pop(context),
+        icon: Icon(Icons.arrow_back_ios_new_rounded),
+      ),
+      backgroundColor: MyColorPalette.purple,
+      foregroundColor: MyColorPalette.white,
+      flexibleSpace: FlexibleSpaceBar(
+        centerTitle: true,
+        expandedTitleScale: 1,
+        background: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+
+              colors: [
+                Color.fromARGB(255, 83, 63, 255),
+                Color.fromARGB(255, 96, 78, 255),
+                Color.fromARGB(255, 126, 112, 255),
+              ],
+              stops: [0.0, 0.55, 1.0],
+            ),
+            // borderRadius: BorderRadius.all(Radius.circular(16)),
+          ),
+          child: Center(
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  right: -30,
+                  top: -20,
+                  child: IgnorePointer(
+                    child: Container(
+                      width: 270,
+                      height: 270,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          radius: 0.7,
+                          colors: [
+                            Color.fromARGB(80, 255, 255, 255),
+                            Color.fromARGB(40, 255, 255, 255),
+                            Color.fromARGB(15, 255, 255, 255),
+                            Color.fromARGB(3, 255, 255, 255),
+                            Colors.transparent,
+                          ],
+                          stops: [0.0, 0.4, 0.6, 0.7, 1.0],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  bottom: -10,
+                  child: IgnorePointer(
+                    child: Container(
+                      width: 110,
+                      height: 110,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          radius: 0.4,
+                          colors: [
+                            Color.fromARGB(80, 255, 255, 255),
+                            Color.fromARGB(40, 255, 255, 255),
+                            Color.fromARGB(15, 255, 255, 255),
+                            Color.fromARGB(3, 255, 255, 255),
+                            Colors.transparent,
+                          ],
+                          stops: [0.0, 0.4, 0.6, 0.7, 1.0],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                LottieBuilder.asset(
+                  'assets/gifs/clipboard.json',
+                  animate: true,
+                  height: 200,
+                ),
+              ],
+            ),
+          ),
+        ),
+        title: Text(
+          "Behaviour Report",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: MyColorPalette.white,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildReportsList() {
     return Obx(() {
       if (_report.isLoading.value) {
@@ -199,7 +200,8 @@ class _ReportListPageState extends State<ReportListPage> {
       }
 
       return ListView.builder(
-        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: _report.reports.length,
         itemBuilder: (context, index) {
           var report = _report.reports[index];

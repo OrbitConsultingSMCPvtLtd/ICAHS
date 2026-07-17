@@ -6,11 +6,10 @@ import 'package:icahs_hwr/models/batch_model.dart';
 import 'package:icahs_hwr/service/http_service.dart';
 
 class BatchController extends GetxController {
-  BatchController(this._http);
+  BatchController(this._http, this.authController);
 
   final HttpService _http;
-  final AuthController _authController = Get.find<AuthController>();
-
+  final AuthController authController;
   final RxList<BatchModel> batches = <BatchModel>[].obs;
   final Rxn<BatchModel> batchDetail = Rxn<BatchModel>();
 
@@ -39,7 +38,7 @@ class BatchController extends GetxController {
   Future<void> loadInitialBatches() async {
     isLoading.value = true;
     try {
-      var user = _authController.user!;
+      var user = authController.user!;
       offset = 0;
 
       var res = await _http.getRequest(
@@ -65,7 +64,7 @@ class BatchController extends GetxController {
   }
 
   Future<void> getBatchDetails(String id) async {
-    final user = _authController.user!;
+    final user = authController.user!;
     try {
       isDetailLoading.value = true;
       var res = await _http.getRequest(

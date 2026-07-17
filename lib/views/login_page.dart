@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:icahs_hwr/controllers/auth_controller.dart';
 import 'package:icahs_hwr/core/helper.dart';
 import 'package:icahs_hwr/core/my_color_palette.dart';
-import 'package:icahs_hwr/views/home/home_page.dart';
 import 'package:icahs_hwr/widgets/my_button.dart';
 import 'package:icahs_hwr/widgets/my_text_field.dart';
 
@@ -34,12 +33,7 @@ class _LoginPageState extends State<LoginPage> {
       _passwordController.text.trim(),
     );
     if (result['status']) {
-      if (!mounted) return;
       isLoading.value = false;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => HomePage()),
-      );
       showSnackBar('Success', result['message'], color: MyColorPalette.success);
     } else {
       isLoading.value = false;

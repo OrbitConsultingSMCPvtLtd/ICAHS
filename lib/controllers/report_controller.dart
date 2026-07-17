@@ -6,10 +6,10 @@ import 'package:icahs_hwr/models/report_model.dart';
 import 'package:icahs_hwr/service/http_service.dart';
 
 class ReportController extends GetxController {
-  ReportController(this._http);
+  ReportController(this._http, this.authController);
 
   final HttpService _http;
-  final AuthController _authController = Get.find<AuthController>();
+  final AuthController authController;
 
   final RxList<ReportModel> reports = <ReportModel>[].obs;
   RxBool isLoading = false.obs;
@@ -27,7 +27,7 @@ class ReportController extends GetxController {
   Future<void> loadInitialReports(String batchId) async {
     isLoading.value = true;
     try {
-      var user = _authController.user!;
+      var user = authController.user!;
       offset = 0;
 
       var res = await _http.getRequest(
@@ -60,7 +60,7 @@ class ReportController extends GetxController {
   }
 
   Future<void> loadReportDetails(String batchId, String reportId) async {
-    final user = _authController.user!;
+    final user = authController.user!;
     try {
       isDetailLoading.value = true;
       var res = await _http.getRequest(
@@ -85,7 +85,7 @@ class ReportController extends GetxController {
   Future<Map<String, dynamic>> createBehaivourReport(
     Map<String, dynamic> bodyData,
   ) async {
-    final user = _authController.user!;
+    final user = authController.user!;
 
     var reqBody = {
       "p_co": user.instituteId,
@@ -113,7 +113,7 @@ class ReportController extends GetxController {
   Future<Map<String, dynamic>> updateBehaivourReport(
     Map<String, dynamic> bodyData,
   ) async {
-    final user = _authController.user!;
+    final user = authController.user!;
 
     var reqBody = {
       "p_co": user.instituteId,
@@ -145,7 +145,7 @@ class ReportController extends GetxController {
   ) async {
     isLoading.value = true;
     try {
-      var user = _authController.user!;
+      var user = authController.user!;
       var res = await _http.postRequestEncoded('/delete_behaviour', null, {
         "p_co": user.instituteId,
         "user_id": user.id,
@@ -166,7 +166,7 @@ class ReportController extends GetxController {
   }
 
   Future<void> getIssueTypeLov() async {
-    final user = _authController.user!;
+    final user = authController.user!;
     try {
       var res = await _http.getRequest("/issue_type_lov/${user.instituteId}");
       var body = jsonDecode(res.body);
@@ -181,7 +181,7 @@ class ReportController extends GetxController {
   }
 
   Future<void> getSeverityLov() async {
-    final user = _authController.user!;
+    final user = authController.user!;
     try {
       var res = await _http.getRequest("/severity_lov/${user.instituteId}");
 
@@ -197,7 +197,7 @@ class ReportController extends GetxController {
   }
 
   Future<void> getActionsRequiredLov() async {
-    final user = _authController.user!;
+    final user = authController.user!;
     try {
       var res = await _http.getRequest("/action_required/${user.instituteId}");
 

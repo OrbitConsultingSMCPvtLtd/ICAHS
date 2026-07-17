@@ -6,10 +6,10 @@ import 'package:icahs_hwr/models/dashboard_stats.dart';
 import 'package:icahs_hwr/service/http_service.dart';
 
 class DashboardController extends GetxController {
-  DashboardController(this._http);
+  DashboardController(this.http, this.authController);
 
-  final HttpService _http;
-  final AuthController _authController = Get.find<AuthController>();
+  final HttpService http;
+  final AuthController authController;
 
   DashboardStats stats = DashboardStats();
   RxBool isLoading = false.obs;
@@ -43,9 +43,9 @@ class DashboardController extends GetxController {
   }
 
   Future<Map<String, dynamic>> getAttendanceCount() async {
-    var user = _authController.user!;
+    var user = authController.user!;
     try {
-      final response = await _http.getRequest(
+      final response = await http.getRequest(
         '/attendance_count/${user.instituteId}/${user.userType}/${user.id}',
       );
       var body = jsonDecode(response.body);
@@ -58,9 +58,9 @@ class DashboardController extends GetxController {
   }
 
   Future<Map<String, dynamic>> getBatchesCount() async {
-    var user = _authController.user!;
+    var user = authController.user!;
     try {
-      final response = await _http.getRequest(
+      final response = await http.getRequest(
         '/batches_count/${user.instituteId}/${user.userType}/${user.id}',
       );
       var body = jsonDecode(response.body);
@@ -73,9 +73,9 @@ class DashboardController extends GetxController {
   }
 
   Future<Map<String, dynamic>> getEvaluationCount() async {
-    var user = _authController.user!;
+    var user = authController.user!;
     try {
-      final response = await _http.getRequest(
+      final response = await http.getRequest(
         '/evaluation_count/${user.instituteId}/${user.userType}/${user.id}',
       );
       var body = jsonDecode(response.body);
@@ -88,9 +88,9 @@ class DashboardController extends GetxController {
   }
 
   Future<Map<String, dynamic>> getBehaviourReportsCount() async {
-    var user = _authController.user!;
+    var user = authController.user!;
     try {
-      final response = await _http.getRequest(
+      final response = await http.getRequest(
         '/behaviour_count/${user.instituteId}/${user.userType}/${user.id}',
       );
       var body = jsonDecode(response.body);

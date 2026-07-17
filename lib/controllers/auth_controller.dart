@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icahs_hwr/models/token.dart';
 import 'package:icahs_hwr/models/user.dart';
@@ -84,7 +85,7 @@ class AuthController extends GetxController {
 
       _user = User.fromJson(jsonDecode(tUser));
 
-      print(_user?.toJson());
+      debugPrint("${_user?.toJson()}");
 
       isLogin.value = true;
     } catch (e) {
@@ -101,6 +102,8 @@ class AuthController extends GetxController {
 
     await prefs.remove("token");
     await prefs.remove("user");
+
+    isLogin.value = false;
   }
 
   bool _isTokenExpired(String expiry) {

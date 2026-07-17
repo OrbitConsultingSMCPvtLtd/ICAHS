@@ -7,10 +7,10 @@ import 'package:icahs_hwr/models/student_attendance_model.dart';
 import 'package:icahs_hwr/service/http_service.dart';
 
 class AttendanceController extends GetxController {
-  AttendanceController(this._http);
+  AttendanceController(this._http, this.authController);
 
   final HttpService _http;
-  final AuthController _authController = Get.find<AuthController>();
+  final AuthController authController;
 
   final RxList<AttendanceModel> attendanceRecords = <AttendanceModel>[].obs;
   RxBool isLoading = false.obs;
@@ -26,7 +26,7 @@ class AttendanceController extends GetxController {
   Future<void> loadInitialAttendanceRecords(String batchId) async {
     isLoading.value = true;
     try {
-      var user = _authController.user!;
+      var user = authController.user!;
       offset = 0;
 
       var res = await _http.getRequest(
@@ -44,7 +44,6 @@ class AttendanceController extends GetxController {
         ),
       );
 
-      print(attendanceRecords.length);
     } catch (e) {
       printError(info: e.toString());
     } finally {
@@ -58,7 +57,7 @@ class AttendanceController extends GetxController {
   ) async {
     isStdLoading.value = true;
     try {
-      var user = _authController.user!;
+      var user = authController.user!;
       offset = 0;
 
       var res = await _http.getRequest(
@@ -90,7 +89,7 @@ class AttendanceController extends GetxController {
   ) async {
     isStdLoading.value = true;
     try {
-      var user = _authController.user!;
+      var user = authController.user!;
       var res = await _http.postRequestEncoded('/create_attendance', null, {
         "p_co": user.instituteId,
         "user_id": user.id,
@@ -119,7 +118,7 @@ class AttendanceController extends GetxController {
   ) async {
     isStdLoading.value = true;
     try {
-      var user = _authController.user!;
+      var user = authController.user!;
       var res = await _http.postRequestEncoded('/update_attendance', null, {
         "attendance_id": attendance.hwrAttendanceId,
         "hwr_batch_id": attendance.hwrBatchId,
@@ -152,7 +151,7 @@ class AttendanceController extends GetxController {
   ) async {
     isStdLoading.value = true;
     try {
-      var user = _authController.user!;
+      var user = authController.user!;
       var res = await _http.postRequestEncoded('/delete_attendance', null, {
         "attendance_id": attendanceId,
         "p_co": user.instituteId,

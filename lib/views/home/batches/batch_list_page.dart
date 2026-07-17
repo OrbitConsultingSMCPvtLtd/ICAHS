@@ -33,7 +33,6 @@ class _BatchListPageState extends State<BatchListPage>
   }
 
   void _handleListTileOnTap(String batchId) async {
-
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => BatchDetailPage(batchId: batchId)),
@@ -63,10 +62,7 @@ class _BatchListPageState extends State<BatchListPage>
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return getCustomAppBar(
-      context,
-      title: "My Batches",
-    );
+    return getCustomAppBar(context, title: "My Batches", showLeading: false );
   }
 
   Widget _buildTabBar() {

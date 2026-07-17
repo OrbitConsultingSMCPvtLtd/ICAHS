@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icahs_hwr/controllers/auth_controller.dart';
-import 'package:icahs_hwr/views/home/home_page.dart';
+import 'package:icahs_hwr/views/bottom_nav_page.dart';
 import 'package:icahs_hwr/views/login_page.dart';
 
 class AuthWrapper extends StatefulWidget {
@@ -22,7 +22,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
       }
 
       if (_auth.isLogin.value) {
-        return const HomePage();
+        return const BottomNavPage();
       }
 
       return const LoginPage();

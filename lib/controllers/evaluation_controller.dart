@@ -6,10 +6,10 @@ import 'package:icahs_hwr/models/evaluation_model.dart';
 import 'package:icahs_hwr/service/http_service.dart';
 
 class EvaluationController extends GetxController {
-  EvaluationController(this._http);
+  EvaluationController(this._http, this.authController);
 
   final HttpService _http;
-  final AuthController _authController = Get.find<AuthController>();
+  final AuthController authController;
 
   final RxList<EvaluationModel> evaluations = <EvaluationModel>[].obs;
   RxBool isLoading = false.obs;
@@ -26,7 +26,7 @@ class EvaluationController extends GetxController {
   Future<void> loadInitialEvaluations(String batchId) async {
     isLoading.value = true;
     try {
-      var user = _authController.user!;
+      var user = authController.user!;
       offset = 0;
 
       var res = await _http.getRequest(
@@ -44,7 +44,6 @@ class EvaluationController extends GetxController {
         ),
       );
 
-      print(evaluations.length);
     } catch (e) {
       printError(info: e.toString());
     } finally {
@@ -68,7 +67,7 @@ class EvaluationController extends GetxController {
     //     evaluationDetail.value!.hwrBatchId == batchId) {
     //   return;
     // }
-    final user = _authController.user!;
+    final user = authController.user!;
     try {
       isDetailLoading.value = true;
       var res = await _http.getRequest(
@@ -93,7 +92,7 @@ class EvaluationController extends GetxController {
   Future<Map<String, dynamic>> createEvaluation(
     Map<String, dynamic> bodyData,
   ) async {
-    final user = _authController.user!;
+    final user = authController.user!;
 
     var reqBody = {
       "user_id": user.id,
@@ -122,7 +121,7 @@ class EvaluationController extends GetxController {
   Future<Map<String, dynamic>> updateEvaluation(
     Map<String, dynamic> bodyData,
   ) async {
-    final user = _authController.user!;
+    final user = authController.user!;
 
     var reqBody = {
       "user_id": user.id,
@@ -158,7 +157,7 @@ class EvaluationController extends GetxController {
   ) async {
     isLoading.value = true;
     try {
-      var user = _authController.user!;
+      var user = authController.user!;
       var res = await _http.postRequestEncoded('/delete_evaluation', null, {
         "p_co": user.instituteId,
         "user_id": user.id,
@@ -179,7 +178,7 @@ class EvaluationController extends GetxController {
   }
 
   Future<void> getLearningAttitudeLov() async {
-    final user = _authController.user!;
+    final user = authController.user!;
     try {
       var res = await _http.getRequest(
         "/learning_attitude_lov/${user.instituteId}",
@@ -196,7 +195,7 @@ class EvaluationController extends GetxController {
   }
 
   Future<void> getLevelOfSeriousnessLov() async {
-    final user = _authController.user!;
+    final user = authController.user!;
     try {
       var res = await _http.getRequest(
         "/level_of_seriousness_lov/${user.instituteId}",

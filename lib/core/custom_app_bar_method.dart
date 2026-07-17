@@ -9,15 +9,16 @@ PreferredSizeWidget getCustomAppBar(
   List<Widget>? actions,
   bool hasActionsPadding = true,
   bool hasDivider = true,
-}) {
+  bool showLeading = true,
+  }) {
   return AppBar(
     scrolledUnderElevation: 0,
     foregroundColor: foregroundColor ?? MyColorPalette.purple,
     backgroundColor: backgroundColor,
-    leading: IconButton(
+    leading: showLeading ? IconButton(
       onPressed: () => Navigator.pop(context),
       icon: Icon(Icons.arrow_back_ios_new_rounded),
-    ),
+    ) : null,
     title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
     centerTitle: true,
     actionsPadding: hasActionsPadding 

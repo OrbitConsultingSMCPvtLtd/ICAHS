@@ -5,12 +5,13 @@ import 'package:icahs_hwr/controllers/auth_controller.dart';
 import 'package:icahs_hwr/controllers/dashboard_controller.dart';
 import 'package:icahs_hwr/core/my_color_palette.dart';
 import 'package:icahs_hwr/models/dashboard_stats.dart';
-import 'package:icahs_hwr/views/home/batches/batch_list_page.dart';
 import 'package:icahs_hwr/widgets/my_stat_card.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.navigateToBatches});
+
+  final void Function()? navigateToBatches;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -80,9 +81,9 @@ class _HomePageState extends State<HomePage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF6D5DF6), 
-            Color.fromARGB(255, 96, 78, 255), 
-            Color.fromARGB(255, 126, 112, 255), 
+            Color(0xFF6D5DF6),
+            Color.fromARGB(255, 96, 78, 255),
+            Color.fromARGB(255, 126, 112, 255),
           ],
           stops: [0.0, 0.55, 1.0],
         ),
@@ -170,10 +171,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Expanded(
               child: MyStatCard(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => BatchListPage()),
-                ),
+                onTap: widget.navigateToBatches,
                 icon: LucideIcons.group,
                 title: "My Batches",
                 count: stats.batchesCount.toString(),

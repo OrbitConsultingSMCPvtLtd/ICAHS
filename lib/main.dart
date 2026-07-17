@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
         textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
       ),
-      home: AuthWrapper(),
+      home: const AuthWrapper(),
     );
   }
 }
