@@ -1,0 +1,299 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:icahs_hwr/controllers/attendance_controller.dart';
+import 'package:icahs_hwr/controllers/auth_controller.dart';
+import 'package:icahs_hwr/core/Utils/color_utils.dart';
+import 'package:icahs_hwr/core/Utils/date_utils.dart';
+import 'package:icahs_hwr/core/custom_app_bar_method.dart';
+import 'package:icahs_hwr/core/helper.dart';
+import 'package:icahs_hwr/core/my_color_palette.dart';
+import 'package:icahs_hwr/models/attendance_model.dart';
+import 'package:icahs_hwr/models/batch_model.dart';
+import 'package:icahs_hwr/views/home/attendance/mark_attendance_page.dart';
+import 'package:icahs_hwr/widgets/my_list_tile.dart';
+import 'package:icahs_hwr/widgets/my_stat_card.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+class AttendanceDetailPage extends StatefulWidget {
+  const AttendanceDetailPage({
+    super.key,
+    required this.attnRecord,
+    required this.batch,
+  });
+
+  final AttendanceModel attnRecord;
+  final BatchModel batch;
+
+  @override
+  State<AttendanceDetailPage> createState() => _AttendanceDetailPageState();
+}
+
+class _AttendanceDetailPageState extends State<AttendanceDetailPage> {
+  final AttendanceController _atten = Get.find<AttendanceController>();
+  final AuthController _auth = Get.find<AuthController>();
+
+  @override
+  void initState() {
+    loadingStudentAttendanceRecords();
+    super.initState();
+  }
+
+  void loadingStudentAttendanceRecords() async {
+    await _atten.loadStudentAttendanceRecords(
+      widget.attnRecord.hwrBatchId,
+      widget.attnRecord.hwrAttendanceId,
+    );
+  }
+
+  void _handleDelete() async {
+    final delete = await showAdaptiveDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog.adaptive(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        title: Text(
+          "Delete?",
+          style: TextStyle(
+            color: MyColorPalette.red,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          "This attendance record will be permanently deleted. Are you sure you want to delete it?",
+        ),
+        actionsAlignment: MainAxisAlignment.end,
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context, false);
+            },
+            child: Text(
+              "Go back",
+              style: TextStyle(color: MyColorPalette.black),
+            ),
+          ),
+
+          ElevatedButton(
+            onPressed: () async {
+              var result = await _atten.deletAttendance(
+                widget.attnRecord.hwrAttendanceId,
+                widget.attnRecord.hwrBatchId,
+              );
+
+              showSnackBar(
+                result['status'].toString().toLowerCase().capitalize!,
+                result['message'],
+                color: result['status'] == "SUCCESS"
+                    ? MyColorPalette.success
+                    : MyColorPalette.error,
+              );
+
+              if (!context.mounted) return;
+              Navigator.pop(context, true);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: MyColorPalette.red,
+            ),
+            child: Text("Yes", style: TextStyle(color: MyColorPalette.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (delete == true && mounted) {
+      Navigator.pop(context, true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final attn = widget.attnRecord;
+    return Scaffold(
+      appBar: _buildAppBar(context),
+      body: Column(
+        children: [
+          const SizedBox(height: 10),
+          MyListTile(
+            leading: Icon(
+              CupertinoIcons.calendar_today,
+              color: MyColorPalette.purple,
+              size: 28,
+            ),
+            color: Colors.transparent,
+            title: formatDateToDDMMMMYYYY(attn.dated),
+            sub1: attn.batchName,
+            sub2: widget.batch.hospitalName,
+            trailing: Text(
+              attn.attendanceStatus,
+              style: TextStyle(
+                color: getColorFromStatus(
+                  attn.attendanceStatus,
+                  isBackground: false,
+                ),
+              ),
+            ),
+            chipColor: getColorFromStatus(
+              attn.attendanceStatus,
+              isBackground: true,
+            ),
+            elevation: 0,
+          ),
+          const SizedBox(height: 10),
+          _buildAttendanceStatCards(),
+          const SizedBox(height: 10),
+          _buildStudentAttendanceList(),
+        ],
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    return getCustomAppBar(
+      context,
+      foregroundColor: MyColorPalette.white,
+      backgroundColor: MyColorPalette.purple,
+      actions: _auth.user!.isSupervisor && widget.batch.isActive()
+          ? [
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MarkAttendancePage(
+                        pageTitle: "Update Attendance",
+                        batch: widget.batch,
+                        attendance: widget.attnRecord,
+                        attendanceDetails: _atten.stdAttendanceRecords,
+                      ),
+                    ),
+                  );
+                },
+                icon: Icon(LucideIcons.pencil, size: 26),
+              ),
+              IconButton(
+                onPressed: _handleDelete,
+                icon: Icon(
+                  Icons.delete_rounded,
+                  size: 28,
+                  color: MyColorPalette.red,
+                ),
+              ),
+            ]
+          : null,
+      hasActionsPadding: false,
+      title: "Attendance Details",
+      hasDivider: false,
+    );
+  }
+
+  Widget _buildAttendanceStatCards() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Row(
+        mainAxisAlignment: .spaceAround,
+        spacing: 10,
+        children: [
+          Expanded(
+            child: MyStatCard(
+              title: "Present",
+              count: widget.attnRecord.present.toString(),
+              elevation: 0,
+              spacing: 10,
+              alignment: .center,
+              countFontSize: 36,
+              color: MyColorPalette.lowOpacityGreen,
+              titleColor: MyColorPalette.darkGreen,
+              countColor: MyColorPalette.darkGreen,
+            ),
+          ),
+          Expanded(
+            child: MyStatCard(
+              title: "Absent",
+              count: widget.attnRecord.absent.toString(),
+              elevation: 0,
+              spacing: 10,
+              alignment: .center,
+              countFontSize: 36,
+              color: MyColorPalette.lowOpacityRed,
+              titleColor: MyColorPalette.darkRed,
+              countColor: MyColorPalette.darkRed,
+            ),
+          ),
+          Expanded(
+            child: MyStatCard(
+              title: "Total",
+              count: widget.attnRecord.totalStudents.toString(),
+              elevation: 0,
+              spacing: 10,
+              alignment: .center,
+              countFontSize: 36,
+              color: MyColorPalette.lowOpacityPurple,
+              titleColor: MyColorPalette.darkPurple,
+              countColor: MyColorPalette.darkPurple,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStudentAttendanceList() {
+    return Obx(() {
+      if (_atten.isStdLoading.value) {
+        return Expanded(
+          child: const Center(child: CircularProgressIndicator.adaptive()),
+        );
+      }
+
+      if (_atten.stdAttendanceRecords.isEmpty) {
+        return Expanded(child: const Center(child: Text("No Records Found!")));
+      }
+
+      return Expanded(
+        child: ListView.builder(
+          itemCount: _atten.stdAttendanceRecords.length,
+          itemBuilder: (context, index) {
+            var attd = _atten.stdAttendanceRecords[index];
+            return MyListTile(
+              elevation: 0,
+              borderRadius: 6,
+              horizontalMargin: 8,
+              leading: Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: const CircleAvatar(
+                  backgroundImage: AssetImage('assets/icons/profile.png'),
+                ),
+              ),
+              alignment: .center,
+              title:
+                  "${attd.studentName.toLowerCase().capitalize} (STU${attd.studentId})",
+              sub2: attd.remarks,
+              trailing: Center(
+                child: Text(
+                  attd.studentStatus,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: getColorFromStatus(
+                      attd.studentStatus,
+                      isBackground: false,
+                    ),
+                  ),
+                ),
+              ),
+              chipColor: getColorFromStatus(
+                attd.studentStatus,
+                isBackground: true,
+              ),
+              titleTextStyle: TextStyle(fontSize: 16),
+            );
+          },
+        ),
+      );
+    });
+  }
+}
