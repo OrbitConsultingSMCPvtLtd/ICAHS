@@ -58,7 +58,7 @@ class _BatchDetailPageState extends State<BatchDetailPage>
             var batch = _batchController.batchDetail.value!;
             return ListView(
               children: [
-                if (!batch.isActive()) _buildCaution(),
+                if (!batch.isActive) _buildCaution(),
                 _buildBatchInfoCard(batch),
                 _buildStatCards(batch),
                 const SizedBox(height: 5),

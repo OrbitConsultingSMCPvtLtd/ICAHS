@@ -73,7 +73,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(MediaQuery.heightOf(context) / 3),
+        preferredSize: Size.fromHeight(MediaQuery.heightOf(context) / 2.5),
         child: Container(
           width: double.infinity,
           height: double.infinity,
@@ -147,7 +147,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 mainAxisAlignment: .center,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 30.0),
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
                     child: Text(
                       "Profile",
                       style: TextStyle(
@@ -165,8 +165,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
-                    child: const CircleAvatar(
-                      radius: 55,
+                    child: CircleAvatar(
+                      radius: MediaQuery.heightOf(context) <= 413 ? 35 : 55,
                       backgroundImage: AssetImage('assets/icons/profile.png'),
                     ),
                   ),

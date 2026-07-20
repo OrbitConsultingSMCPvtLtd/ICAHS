@@ -81,7 +81,7 @@ class BatchModel {
     };
   }
 
-  bool isActive() {
+  bool get isActive {
     return status == 'Y';
   }
 }

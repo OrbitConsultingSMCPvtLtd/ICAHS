@@ -7,8 +7,8 @@ import 'package:icahs_hwr/controllers/batch_controller.dart';
 import 'package:icahs_hwr/core/my_color_palette.dart';
 
 bool canCreateOrEdit() {
-  if (Get.find<AuthController>().user?.userType == 1 &&
-      Get.find<BatchController>().batchDetail.value!.isActive()) {
+  if (Get.find<AuthController>().user!.isSupervisor &&
+      Get.find<BatchController>().batchDetail.value!.isActive) {
     return true;
   } else {
     return false;

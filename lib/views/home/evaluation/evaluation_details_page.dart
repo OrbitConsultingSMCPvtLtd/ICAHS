@@ -392,7 +392,7 @@ class _EvaluationDetailsPageState extends State<EvaluationDetailsPage>
       hasActionsPadding: false,
       actions:
           _authController.user!.isSupervisor &&
-              _batchController.batchDetail.value!.isActive()
+              _batchController.batchDetail.value!.isActive
           ? [
               IconButton(
                 onPressed: _handleDelete,

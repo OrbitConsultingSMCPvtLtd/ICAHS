@@ -145,7 +145,7 @@ class _AttendanceDetailPageState extends State<AttendanceDetailPage> {
       context,
       foregroundColor: MyColorPalette.white,
       backgroundColor: MyColorPalette.purple,
-      actions: _auth.user!.isSupervisor && widget.batch.isActive()
+      actions: _auth.user!.isSupervisor && widget.batch.isActive
           ? [
               IconButton(
                 onPressed: _handleDelete,

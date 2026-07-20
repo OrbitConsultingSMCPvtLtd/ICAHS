@@ -204,7 +204,7 @@ class _ReportDetailsPageState extends State<ReportDetailsPage> {
       icon: Image.asset('assets/icons/report-icon.png', width: 25),
       foregroundColor: MyColorPalette.white,
       backgroundColor: MyColorPalette.purple,
-      actions: _auth.user!.isSupervisor && _batch.batchDetail.value!.isActive()
+      actions: _auth.user!.isSupervisor && _batch.batchDetail.value!.isActive
           ? [
               IconButton(
                 onPressed: _handleDelete,
