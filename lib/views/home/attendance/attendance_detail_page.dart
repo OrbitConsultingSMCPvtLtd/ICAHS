@@ -5,6 +5,7 @@ import 'package:icahs_hwr/controllers/attendance_controller.dart';
 import 'package:icahs_hwr/controllers/auth_controller.dart';
 import 'package:icahs_hwr/core/Utils/color_utils.dart';
 import 'package:icahs_hwr/core/Utils/date_utils.dart';
+import 'package:icahs_hwr/core/Utils/utils.dart';
 import 'package:icahs_hwr/core/custom_app_bar_method.dart';
 import 'package:icahs_hwr/core/helper.dart';
 import 'package:icahs_hwr/core/my_color_palette.dart';
@@ -47,34 +48,11 @@ class _AttendanceDetailPageState extends State<AttendanceDetailPage> {
   }
 
   void _handleDelete() async {
-    final delete = await showAdaptiveDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog.adaptive(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        title: Text(
-          "Delete?",
-          style: TextStyle(
-            color: MyColorPalette.red,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          "This attendance record will be permanently deleted. Are you sure you want to delete it?",
-        ),
-        actionsAlignment: MainAxisAlignment.end,
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context, false);
-            },
-            child: Text(
-              "Go back",
-              style: TextStyle(color: MyColorPalette.black),
-            ),
-          ),
-
-          ElevatedButton(
-            onPressed: () async {
+    final delete = await deleteDialog(
+      context,
+      title: "Delete?",
+      content: "This Attendance record will be permanently deleted. Are you sure you want to delete it?",
+      onTap: () async {
               var result = await _atten.deletAttendance(
                 widget.attnRecord.hwrAttendanceId,
                 widget.attnRecord.hwrBatchId,
@@ -88,17 +66,12 @@ class _AttendanceDetailPageState extends State<AttendanceDetailPage> {
                     : MyColorPalette.error,
               );
 
-              if (!context.mounted) return;
+              if (!mounted) return;
               Navigator.pop(context, true);
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: MyColorPalette.red,
-            ),
-            child: Text("Yes", style: TextStyle(color: MyColorPalette.white)),
-          ),
-        ],
-      ),
     );
+
+
 
     if (delete == true && mounted) {
       Navigator.pop(context, true);
@@ -144,6 +117,26 @@ class _AttendanceDetailPageState extends State<AttendanceDetailPage> {
           _buildStudentAttendanceList(),
         ],
       ),
+      floatingActionButton: canCreateOrEdit()
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MarkAttendancePage(
+                      pageTitle: "Update Attendance",
+                      batch: widget.batch,
+                      attendance: widget.attnRecord,
+                      attendanceDetails: _atten.stdAttendanceRecords,
+                    ),
+                  ),
+                );
+              },
+              backgroundColor: MyColorPalette.purple,
+              foregroundColor: MyColorPalette.white,
+              child: Icon(LucideIcons.pencil),
+            )
+          : null,
     );
   }
 
@@ -154,22 +147,6 @@ class _AttendanceDetailPageState extends State<AttendanceDetailPage> {
       backgroundColor: MyColorPalette.purple,
       actions: _auth.user!.isSupervisor && widget.batch.isActive()
           ? [
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => MarkAttendancePage(
-                        pageTitle: "Update Attendance",
-                        batch: widget.batch,
-                        attendance: widget.attnRecord,
-                        attendanceDetails: _atten.stdAttendanceRecords,
-                      ),
-                    ),
-                  );
-                },
-                icon: Icon(LucideIcons.pencil, size: 26),
-              ),
               IconButton(
                 onPressed: _handleDelete,
                 icon: Icon(

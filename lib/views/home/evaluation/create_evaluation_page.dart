@@ -180,7 +180,12 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
   }
 
   void _handleButtonTap() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      print("fail");
+      return;
+    }
+
+    print("pass");
 
     evaluation['evaluation_date'] = dateController.text.trim();
 
@@ -352,8 +357,8 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
   }
 
   bool _validateCurrentStep() {
-    if (_currentStep < 6) {
-      return _stepFormKeys[_currentStep].currentState!.validate();
+    if (_currentStep > 0) {
+      return _stepFormKeys[_currentStep - 1].currentState!.validate();
     } else {
       return _formKey.currentState?.validate() ?? false;
     }
@@ -417,20 +422,24 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: MyColorPalette.white,
-      appBar: _buildAppBar(context),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-          child: Column(
-            children: [
-              _buildProgressIndicator(),
-              const SizedBox(height: 16),
-              Expanded(child: _buildCurrentStep()),
-              _buildNavigationButtons(),
-              const SizedBox(height: 10),
-            ],
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: MyColorPalette.white,
+        resizeToAvoidBottomInset: false,
+        appBar: _buildAppBar(context),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: Column(
+              children: [
+                _buildProgressIndicator(),
+                const SizedBox(height: 16),
+                Expanded(child: _buildCurrentStep()),
+                _buildNavigationButtons(),
+                const SizedBox(height: 10),
+              ],
+            ),
           ),
         ),
       ),
@@ -490,37 +499,36 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
   String _getCurrntStepProgressIndicatorTitle(int index) {
     switch (index) {
       case 0:
-        return "AP";
+        return "Info";
       case 1:
-        return "DC";
+        return "AP";
       case 2:
-        return "LB";
+        return "DC";
       case 3:
-        return "CSP";
+        return "LB";
       case 4:
-        return "WEP";
+        return "CSP";
       case 5:
-        return "ATL";
+        return "WEP";
       case 6:
-        return "Final";
+        return "ATL";
       default:
         return "$index + 1";
     }
   }
 
   Widget _buildCurrentStep() {
-    if (_currentStep < 6) {
+    if (_currentStep > 0) {
       // Score card steps
       return Form(
-        key: _stepFormKeys[_currentStep],
+        key: _stepFormKeys[_currentStep - 1],
         child: _buildScoreCard(
-          titles[_currentStep],
-          cardBody[_currentStep],
+          titles[_currentStep - 1],
+          cardBody[_currentStep - 1],
           _getControllers(_currentStep),
         ),
       );
     } else {
-      // Final step with student selection, date, etc.
       return Form(
         key: _formKey,
         child: ListView(
@@ -534,6 +542,7 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
                 if (val == null) return;
                 evaluation['student_id'] = val;
               },
+              isEnable: !widget.isUpdate,
             ),
             _buildInputTextField(
               controller: dateController,
@@ -551,6 +560,12 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
                 },
                 icon: Icon(LucideIcons.calendarDays),
               ),
+              validator: (val) {
+                if (val == null) {
+                  return "Please select a date";
+                }
+                return null;
+              },
               readOnly: true,
             ),
             _buildDropdownMenuInputField(
@@ -588,17 +603,17 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
 
   List<TextEditingController> _getControllers(int index) {
     switch (index) {
-      case 0:
-        return apRemarksControllers;
       case 1:
-        return dcRemarksControllers;
+        return apRemarksControllers;
       case 2:
-        return lbRemarksControllers;
+        return dcRemarksControllers;
       case 3:
-        return cspRemarksControllers;
+        return lbRemarksControllers;
       case 4:
-        return wepRemarksControllers;
+        return cspRemarksControllers;
       case 5:
+        return wepRemarksControllers;
+      case 6:
         return atlRemarksControllers;
       default:
         return [];
@@ -671,6 +686,7 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
     required void Function(String?)? onSelected,
     required String? initial,
     bool isRequired = true,
+    bool isEnable = true,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 3.0, left: 12, right: 12),
@@ -687,6 +703,7 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
             hintText: hintText,
             entries: entries,
             initial: initial,
+            isEnable: isEnable,
             width: double.infinity,
             borderColor: MyColorPalette.textGrey,
             color: MyColorPalette.white,
@@ -717,6 +734,7 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
     bool readOnly = false,
     bool isEndabled = true,
     void Function()? onTap,
+    String? Function(String?)? validator,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 3.0, left: 12, right: 12),
@@ -739,6 +757,7 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
             onTap: onTap,
             readOnly: readOnly,
             trailing: trailing,
+            validator: validator,
           ),
         ],
       ),
@@ -769,87 +788,112 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
                 style: const TextStyle(
                   color: MyColorPalette.purple,
                   fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                  fontSize: 17,
                 ),
               ),
             ),
-            Row(
-              mainAxisAlignment: .spaceEvenly,
-              crossAxisAlignment: .center,
+            Column(
+              mainAxisSize: .min,
               children: [
-                MyButton(
-                  onTap: () {
-                    setState(() {
-                      for (var i = 0; i < body.length; i++) {
-                        evaluation[keys[_currentStep][i]['score']!] = 5;
-                        controllers[i].text = "Excellent";
-                      }
-                    });
-                  },
-                  color: MyColorPalette.green,
-                  hasFixedSize: false,
-                  borderRadius: 14,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: const Text(
-                      "Excellent",
-                      style: TextStyle(color: MyColorPalette.white),
+                Row(
+                  crossAxisAlignment: .center,
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: MyButton(
+                        onTap: () {
+                          setState(() {
+                            for (var i = 0; i < body.length; i++) {
+                              evaluation[keys[_currentStep - 1][i]['score']!] =
+                                  5;
+                              controllers[i].text = "Excellent";
+                            }
+                          });
+                        },
+                        color: MyColorPalette.green,
+                        hasFixedSize: false,
+                        borderRadius: 14,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: const Text(
+                            "Excellent",
+                            style: TextStyle(color: MyColorPalette.white),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                MyButton(
-                  onTap: () {
-                    setState(() {
-                      for (var i = 0; i < body.length; i++) {
-                        evaluation[keys[_currentStep][i]['score']!] = 4;
-                        controllers[i].text = "Good";
-                      }
-                    });
-                  },
-                  hasFixedSize: false,
-                  borderRadius: 14,
-                  color: MyColorPalette.blue,
-                  child: const Text(
-                    "Good",
-                    style: TextStyle(color: MyColorPalette.white),
-                  ),
-                ),
-                MyButton(
-                  onTap: () {
-                    setState(() {
-                      for (var i = 0; i < body.length; i++) {
-                        evaluation[keys[_currentStep][i]['score']!] = 3;
-                        controllers[i].text = "Average";
-                      }
-                    });
-                  },
-                  hasFixedSize: false,
-                  borderRadius: 14,
-                  color: MyColorPalette.orange,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: const Text(
-                      "Average",
-                      style: TextStyle(color: MyColorPalette.white),
+                    Expanded(
+                      flex: 4,
+                      child: MyButton(
+                        onTap: () {
+                          setState(() {
+                            for (var i = 0; i < body.length; i++) {
+                              evaluation[keys[_currentStep - 1][i]['score']!] =
+                                  4;
+                              controllers[i].text = "Good";
+                            }
+                          });
+                        },
+                        hasFixedSize: false,
+                        borderRadius: 14,
+                        color: MyColorPalette.blue,
+                        child: const Text(
+                          "Good",
+                          style: TextStyle(color: MyColorPalette.white),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-                MyButton(
-                  onTap: () {
-                    setState(() {
-                      for (var i = 0; i < body.length; i++) {
-                        evaluation[keys[_currentStep][i]['score']!] = 2;
-                        controllers[i].text = "Poor";
-                      }
-                    });
-                  },
-                  hasFixedSize: false,
-                  borderRadius: 14,
-                  color: MyColorPalette.red,
-                  child: const Text(
-                    "Poor",
-                    style: TextStyle(color: MyColorPalette.white),
-                  ),
+                Row(
+                  crossAxisAlignment: .center,
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: MyButton(
+                        onTap: () {
+                          setState(() {
+                            for (var i = 0; i < body.length; i++) {
+                              evaluation[keys[_currentStep - 1][i]['score']!] =
+                                  3;
+                              controllers[i].text = "Average";
+                            }
+                          });
+                        },
+                        hasFixedSize: false,
+                        borderRadius: 14,
+                        color: MyColorPalette.orange,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: const Text(
+                            "Average",
+                            style: TextStyle(color: MyColorPalette.white),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 5,
+                      child: MyButton(
+                        onTap: () {
+                          setState(() {
+                            for (var i = 0; i < body.length; i++) {
+                              evaluation[keys[_currentStep - 1][i]['score']!] =
+                                  2;
+                              controllers[i].text = "Poor";
+                            }
+                          });
+                        },
+                        hasFixedSize: false,
+                        borderRadius: 14,
+                        color: MyColorPalette.red,
+                        child: const Text(
+                          "Poor",
+                          style: TextStyle(color: MyColorPalette.white),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -893,7 +937,7 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
                       textAlign: TextAlign.center,
                       hintText: "Select ${body[i]['label']}",
                       labelText: body[i]['label'],
-                      initial: evaluation[keys[_currentStep][i]['score']!]
+                      initial: evaluation[keys[_currentStep - 1][i]['score']!]
                           .toString(),
                       entries: scoreLov,
                       width: double.infinity,
@@ -902,9 +946,8 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
                       borderRadius: 8,
                       menuColor: const Color.fromARGB(255, 244, 245, 252),
                       onSelected: (val) {
-                        evaluation[keys[_currentStep][i]['score']!] = int.parse(
-                          val!,
-                        );
+                        evaluation[keys[_currentStep - 1][i]['score']!] =
+                            int.parse(val!);
                       },
                       validator: (val) {
                         if (val == null) {

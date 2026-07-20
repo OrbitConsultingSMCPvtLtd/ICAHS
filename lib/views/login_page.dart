@@ -135,27 +135,26 @@ class _LoginPageState extends State<LoginPage> {
                       Text(
                         "Welcome Back",
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         "Please Login to continue",
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           color: MyColorPalette.textGrey,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       _buildForm(),
-                      SizedBox(height: 20), // Add bottom padding
+                      SizedBox(height: 10), // Add bottom padding
                       Center(
                         child: Text(
                           'Version 1.0.0',
                           style: TextStyle(color: MyColorPalette.textGrey),
                         ),
                       ),
-                      SizedBox(height: 10), // Extra bottom space
                     ],
                   ),
                 ),
@@ -193,7 +192,6 @@ class _LoginPageState extends State<LoginPage> {
               }
             },
           ),
-          const SizedBox(height: 10),
           Text(
             'Password',
             style: TextStyle(
@@ -228,7 +226,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             );
           }),
-          const SizedBox(height: 30),
+          const SizedBox(height: 20),
           Obx(() {
             return MyButton(
               onTap: _handleLogin,

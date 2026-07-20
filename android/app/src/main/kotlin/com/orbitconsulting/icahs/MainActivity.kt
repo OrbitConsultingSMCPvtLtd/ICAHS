@@ -1,4 +1,4 @@
-package com.example.icahs_hwr
+package com.orbitconsulting.icahs
 
 import io.flutter.embedding.android.FlutterActivity
 

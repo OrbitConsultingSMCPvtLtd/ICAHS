@@ -5,6 +5,7 @@ import 'package:icahs_hwr/controllers/auth_controller.dart';
 import 'package:icahs_hwr/controllers/batch_controller.dart';
 import 'package:icahs_hwr/controllers/evaluation_controller.dart';
 import 'package:icahs_hwr/core/Utils/date_utils.dart';
+import 'package:icahs_hwr/core/Utils/utils.dart';
 import 'package:icahs_hwr/core/custom_app_bar_method.dart';
 import 'package:icahs_hwr/core/helper.dart';
 import 'package:icahs_hwr/core/my_color_palette.dart';
@@ -35,57 +36,28 @@ class _EvaluationDetailsPageState extends State<EvaluationDetailsPage>
   final AuthController _authController = Get.find<AuthController>();
 
   void _handleDelete() async {
-    final delete = await showAdaptiveDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog.adaptive(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        title: Text(
-          "Delete?",
-          style: TextStyle(
-            color: MyColorPalette.red,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
+    final delete = await deleteDialog(
+      context,
+      title: "Delete?",
+      content:
           "This Evaluation record will be permanently deleted. Are you sure you want to delete it?",
-        ),
-        actionsAlignment: MainAxisAlignment.end,
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context, false);
-            },
-            child: Text(
-              "Go back",
-              style: TextStyle(color: MyColorPalette.black),
-            ),
-          ),
+      onTap: () async {
+        var result = await _evaluationController.deleteEvaluation(
+          widget.batchId,
+          widget.evaluationId,
+        );
 
-          ElevatedButton(
-            onPressed: () async {
-              var result = await _evaluationController.deleteEvaluation(
-                widget.batchId,
-                widget.evaluationId,
-              );
+        showSnackBar(
+          result['status'].toString().toLowerCase().capitalize!,
+          result['message'],
+          color: result['status'] == "SUCCESS"
+              ? MyColorPalette.success
+              : MyColorPalette.error,
+        );
 
-              showSnackBar(
-                result['status'].toString().toLowerCase().capitalize!,
-                result['message'],
-                color: result['status'] == "SUCCESS"
-                    ? MyColorPalette.success
-                    : MyColorPalette.error,
-              );
-
-              if (!context.mounted) return;
-              Navigator.pop(context, true);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: MyColorPalette.red,
-            ),
-            child: Text("Yes", style: TextStyle(color: MyColorPalette.white)),
-          ),
-        ],
-      ),
+        if (!mounted) return;
+        Navigator.pop(context, true);
+      },
     );
 
     if (delete == true && mounted) {
@@ -388,22 +360,8 @@ class _EvaluationDetailsPageState extends State<EvaluationDetailsPage>
             ],
           );
         }),
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return getCustomAppBar(
-      context,
-      title: "Evaluation Details",
-      foregroundColor: MyColorPalette.white,
-      backgroundColor: MyColorPalette.purple,
-      hasActionsPadding: false,
-      actions:
-          _authController.user!.isSupervisor &&
-              _batchController.batchDetail.value!.isActive()
-          ? [
-              IconButton(
+        floatingActionButton: canCreateOrEdit()
+            ? FloatingActionButton(
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -415,8 +373,27 @@ class _EvaluationDetailsPageState extends State<EvaluationDetailsPage>
                     ),
                   );
                 },
-                icon: Icon(LucideIcons.pencil, size: 26),
-              ),
+                backgroundColor: MyColorPalette.purple,
+                foregroundColor: MyColorPalette.white,
+                child: Icon(LucideIcons.pencil),
+              )
+            : null,
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    return getCustomAppBar(
+      context,
+      title: "Evaluation Details",
+      icon: Image.asset('assets/icons/evaluation-icon.png', width: 25),
+      foregroundColor: MyColorPalette.white,
+      backgroundColor: MyColorPalette.purple,
+      hasActionsPadding: false,
+      actions:
+          _authController.user!.isSupervisor &&
+              _batchController.batchDetail.value!.isActive()
+          ? [
               IconButton(
                 onPressed: _handleDelete,
                 icon: Icon(

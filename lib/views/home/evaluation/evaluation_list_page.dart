@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icahs_hwr/controllers/auth_controller.dart';
-import 'package:icahs_hwr/controllers/batch_controller.dart';
 import 'package:icahs_hwr/controllers/evaluation_controller.dart';
 import 'package:icahs_hwr/core/Utils/date_utils.dart';
+import 'package:icahs_hwr/core/Utils/utils.dart';
 import 'package:icahs_hwr/core/custom_app_bar_method.dart';
 import 'package:icahs_hwr/core/my_color_palette.dart';
 import 'package:icahs_hwr/views/home/evaluation/create_evaluation_page.dart';
@@ -22,9 +21,6 @@ class EvaluationListPage extends StatefulWidget {
 
 class _EvaluationListPageState extends State<EvaluationListPage> {
   final EvaluationController _eval = Get.find<EvaluationController>();
-  final BatchController _batch = Get.find<BatchController>();
-  final AuthController _auth = Get.find<AuthController>();
-
   @override
   void initState() {
     super.initState();
@@ -74,7 +70,7 @@ class _EvaluationListPageState extends State<EvaluationListPage> {
         child: _buildEvaluationList(),
       ),
       floatingActionButton:
-          _auth.user!.isSupervisor && _batch.batchDetail.value!.isActive()
+          canCreateOrEdit()
           ? FloatingActionButton.extended(
               onPressed: () {
                 Navigator.push(

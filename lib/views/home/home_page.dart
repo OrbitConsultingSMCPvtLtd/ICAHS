@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icahs_hwr/controllers/auth_controller.dart';
@@ -6,7 +5,7 @@ import 'package:icahs_hwr/controllers/dashboard_controller.dart';
 import 'package:icahs_hwr/core/my_color_palette.dart';
 import 'package:icahs_hwr/models/dashboard_stats.dart';
 import 'package:icahs_hwr/widgets/my_stat_card.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:marquee/marquee.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, this.navigateToBatches});
@@ -34,8 +33,10 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final user = _auth.user!;
+    final screenWidth = MediaQuery.widthOf(context);
     return Scaffold(
       appBar: AppBar(
+        // backgroundColor: Colors.transparent,
         actionsPadding: const EdgeInsets.symmetric(horizontal: 26),
         title: Text(
           "Dashboard",
@@ -43,32 +44,111 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
       ),
-      extendBody: true,
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-        child: RefreshIndicator(
-          onRefresh: () async {
-            loadingDashBoard();
-          },
-          child: ListView(
-            children: [
-              _buildEmpProfileCard(user.fullName, user.role),
-              SizedBox(height: 10),
-              Obx(() {
-                if (_dashboard.isLoading.value) {
-                  return SizedBox(
-                    height: MediaQuery.heightOf(context) * 0.8,
-                    child: Center(child: CircularProgressIndicator.adaptive()),
-                  );
-                }
-
-                return _buildStatCards(_dashboard.stats);
-              }),
-            ],
+      // extendBodyBehindAppBar: true,
+      body: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+            left: 70,
+            bottom: 0,
+            child: Container(
+              width: screenWidth * 2,
+              height: screenWidth * 2,
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(7, 0, 0, 255),
+                shape: BoxShape.circle,
+              ),
+            ),
           ),
-        ),
+
+          Positioned(
+            bottom: screenWidth / 3,
+            right: screenWidth / 3.5,
+            child: IgnorePointer(
+              child: Container(
+                width: 270,
+                height: 270,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    radius: 0.65,
+                    colors: [
+                      Color.fromARGB(238, 253, 252, 252),
+                      Color.fromARGB(59, 253, 249, 249),
+                      Color.fromARGB(15, 255, 255, 255),
+                      Color.fromARGB(3, 255, 255, 255),
+                      Colors.transparent,
+                    ],
+                    stops: [0.0, 0.4, 0.6, 0.7, 1.0],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            height: double.infinity,
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                loadingDashBoard();
+              },
+              child: ListView(
+                children: [
+                  _buildEmpProfileCard(user.fullName, user.role),
+                  const SizedBox(height: 5),
+                  Container(
+                    height: 30,
+                    decoration: const BoxDecoration(
+                      color: MyColorPalette.lowOpacityPurple,
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          MyColorPalette.darkPurple,
+                          MyColorPalette.darkPurple,
+                          Colors.transparent,
+                        ],
+                        stops: [0.0, 0.1, 0.9, 1.0],
+                      ),
+                    ),
+                    child: Center(
+                      child: Marquee(
+                        text: '✚  ICAHS Hospital Ward Rotation',
+                        style: TextStyle(color: MyColorPalette.black),
+                        fadingEdgeStartFraction: 0.3,
+                        fadingEdgeEndFraction: 0.3,
+                        scrollAxis: Axis.horizontal,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        blankSpace: 50.0,
+                        velocity: 70.0,
+                        startPadding: 50.0,
+                        showFadingOnlyWhenScrolling: false,
+                        accelerationDuration: Duration(seconds: 1),
+                        accelerationCurve: Curves.ease,
+                        decelerationDuration: Duration(milliseconds: 500),
+                        decelerationCurve: Curves.ease,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 5),
+                  Obx(() {
+                    if (_dashboard.isLoading.value) {
+                      return SizedBox(
+                        height: MediaQuery.heightOf(context) * 0.8,
+                        child: Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        ),
+                      );
+                    }
+
+                    return _buildStatCards(_dashboard.stats);
+                  }),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -172,14 +252,22 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: MyStatCard(
                 onTap: widget.navigateToBatches,
-                icon: LucideIcons.group,
+                leading: Image.asset(
+                  'assets/icons/batches-icon.png',
+                  width: 25,
+                ),
+                countPadding: EdgeInsets.symmetric(horizontal: 5),
                 title: "My Batches",
                 count: stats.batchesCount.toString(),
               ),
             ),
             Expanded(
               child: MyStatCard(
-                icon: CupertinoIcons.calendar_today,
+                leading: Image.asset(
+                  'assets/icons/attendance-icon.png',
+                  width: 25,
+                ),
+                countPadding: EdgeInsets.symmetric(horizontal: 5),
                 title: "Attendance",
                 count: "${stats.presentCount} / ${stats.totalAttendanceCount}",
               ),
@@ -191,16 +279,21 @@ class _HomePageState extends State<HomePage> {
           children: [
             Expanded(
               child: MyStatCard(
-                icon: LucideIcons.clipboardList,
+                leading: Image.asset(
+                  'assets/icons/evaluation-icon.png',
+                  width: 25,
+                ),
+                countPadding: EdgeInsets.symmetric(horizontal: 5),
                 title: "Evaluations",
                 count: stats.evaluationsCount.toString(),
               ),
             ),
             Expanded(
               child: MyStatCard(
-                icon: LucideIcons.fileText,
+                leading: Image.asset('assets/icons/report-icon.png', width: 25),
                 title: "Reports",
                 count: stats.reportsCount.toString(),
+                countPadding: EdgeInsets.symmetric(horizontal: 5),
               ),
             ),
           ],

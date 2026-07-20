@@ -62,7 +62,7 @@ class _BatchListPageState extends State<BatchListPage>
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return getCustomAppBar(context, title: "My Batches", showLeading: false );
+    return getCustomAppBar(context, title: "My Batches", showLeading: false);
   }
 
   Widget _buildTabBar() {
@@ -138,6 +138,14 @@ class _BatchListPageState extends State<BatchListPage>
     );
   }
 
+  String? startEndTime(String? start, String? end) {
+    if (start == null || end == null) {
+      return null;
+    } else {
+      return "${formatTime(start)} - ${formatTime(end)}";
+    }
+  }
+
   Widget _buildBatchTileList(String filter, Future<void> Function() onRefresh) {
     return Obx(() {
       if (_batch.isLoading.value) {
@@ -162,6 +170,7 @@ class _BatchListPageState extends State<BatchListPage>
                   sub1: batch.hospitalName,
                   sub2:
                       "${formatDateToDDMMMMYYYY(batch.startDate)} - ${formatDateToDDMMMMYYYY(batch.endDate)}",
+                  sub3: startEndTime(batch.startTime, batch.endTime),
                   trailing: Text(
                     batch.status == "Y" ? "Active" : "Inactive",
                     style: TextStyle(
@@ -199,10 +208,12 @@ class _BatchListPageState extends State<BatchListPage>
                   sub1: batch.hospitalName,
                   sub2:
                       "${formatDateToDDMMMMYYYY(batch.startDate)} - ${formatDateToDDMMMMYYYY(batch.endDate)}",
+                  sub3: startEndTime(batch.startTime, batch.endTime),
                   trailing: Text(
                     "Active",
                     style: TextStyle(color: MyColorPalette.darkGreen),
                   ),
+
                   chipColor: MyColorPalette.lowOpacityGreen,
                   onTap: () {
                     _handleListTileOnTap(batch.hwrBatchId);
@@ -229,6 +240,7 @@ class _BatchListPageState extends State<BatchListPage>
                   sub1: batch.hospitalName,
                   sub2:
                       "${formatDateToDDMMMMYYYY(batch.startDate)} - ${formatDateToDDMMMMYYYY(batch.endDate)}",
+                  sub3: startEndTime(batch.startTime, batch.endTime),
                   trailing: Text(
                     "Inactive",
                     style: TextStyle(color: MyColorPalette.darkRed),

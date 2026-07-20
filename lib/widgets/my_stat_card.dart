@@ -15,14 +15,19 @@ class MyStatCard extends StatelessWidget {
     this.titleColor,
     this.color,
     this.elevation = 2,
+    this.leading,
+    this.countPadding,
   });
 
   final IconData? icon;
+  final Widget? leading;
   final String title;
   final String count;
   final double countFontSize;
   final double spacing;
   final double elevation;
+  final EdgeInsetsGeometry? countPadding;
+
   final Color? color;
   final Color? countColor;
   final Color? titleColor;
@@ -54,6 +59,8 @@ class MyStatCard extends StatelessWidget {
                   if (icon != null)
                     Icon(icon, color: MyColorPalette.darkPurple, size: 26),
 
+                  ?leading,
+
                   Text(
                     title,
                     style: TextStyle(
@@ -63,12 +70,15 @@ class MyStatCard extends StatelessWidget {
                   ),
                 ],
               ),
-              Text(
-                count,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: countFontSize,
-                  color: countColor,
+              Padding(
+                padding: countPadding ?? EdgeInsets.all(0.0),
+                child: Text(
+                  count,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: countFontSize,
+                    color: countColor,
+                  ),
                 ),
               ),
             ],

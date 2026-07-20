@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icahs_hwr/controllers/attendance_controller.dart';
-import 'package:icahs_hwr/controllers/auth_controller.dart';
 import 'package:icahs_hwr/core/Utils/color_utils.dart';
 import 'package:icahs_hwr/core/Utils/date_utils.dart';
+import 'package:icahs_hwr/core/Utils/utils.dart';
 import 'package:icahs_hwr/core/custom_app_bar_method.dart';
 import 'package:icahs_hwr/core/my_color_palette.dart';
 import 'package:icahs_hwr/models/batch_model.dart';
@@ -23,7 +23,6 @@ class AttendanceListPage extends StatefulWidget {
 
 class _AttendanceListPageState extends State<AttendanceListPage> {
   final AttendanceController _attendance = Get.find<AttendanceController>();
-  final AuthController _auth = Get.find<AuthController>();
 
   @override
   void initState() {
@@ -45,7 +44,7 @@ class _AttendanceListPageState extends State<AttendanceListPage> {
           Expanded(child: _buildAttendanceList()),
         ],
       ),
-      floatingActionButton: _auth.user!.isSupervisor && widget.batch.isActive()
+      floatingActionButton: canCreateOrEdit()
           ? FloatingActionButton.extended(
               onPressed: () {
                 Navigator.push(

@@ -34,7 +34,7 @@ class _BottomNavPageState extends State<BottomNavPage> {
           ],
         );
       }),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12),
         decoration: const BoxDecoration(

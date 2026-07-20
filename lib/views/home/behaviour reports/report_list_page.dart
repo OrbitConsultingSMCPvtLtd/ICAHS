@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icahs_hwr/controllers/auth_controller.dart';
 import 'package:icahs_hwr/controllers/batch_controller.dart';
 import 'package:icahs_hwr/controllers/report_controller.dart';
 import 'package:icahs_hwr/core/Utils/color_utils.dart';
 import 'package:icahs_hwr/core/Utils/date_utils.dart';
+import 'package:icahs_hwr/core/Utils/utils.dart';
 import 'package:icahs_hwr/core/my_color_palette.dart';
 import 'package:icahs_hwr/views/home/behaviour%20reports/create_report_page.dart';
 import 'package:icahs_hwr/views/home/behaviour%20reports/report_details_page.dart';
@@ -24,7 +24,6 @@ class ReportListPage extends StatefulWidget {
 class _ReportListPageState extends State<ReportListPage> {
   final ReportController _report = Get.find<ReportController>();
   final BatchController _batch = Get.find<BatchController>();
-  final AuthController _auth = Get.find<AuthController>();
 
   @override
   void initState() {
@@ -63,7 +62,7 @@ class _ReportListPageState extends State<ReportListPage> {
         ),
       ),
       floatingActionButton:
-          _auth.user!.isSupervisor && _batch.batchDetail.value!.isActive()
+         canCreateOrEdit()
           ? FloatingActionButton.extended(
               onPressed: () {
                 Navigator.push(

@@ -21,6 +21,7 @@ class MyDropdownFormfield extends StatelessWidget {
     this.elevation = 0,
     this.maxMenuWidth,
     this.labelText,
+    this.isEnable = true,
   });
 
   final String? Function(String?)? validator;
@@ -31,6 +32,7 @@ class MyDropdownFormfield extends StatelessWidget {
   final double? maxMenuWidth;
   final bool showTrailingIcon;
   final bool showBorder;
+  final bool isEnable;
   final TextStyle? labelStyle;
   final TextAlign? textAlign;
   final Color? color;
@@ -46,6 +48,7 @@ class MyDropdownFormfield extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownMenuFormField(
       width: width,
+      enabled: isEnable,
       textAlign: textAlign ?? TextAlign.start,
       initialSelection: initial,
       validator: validator,

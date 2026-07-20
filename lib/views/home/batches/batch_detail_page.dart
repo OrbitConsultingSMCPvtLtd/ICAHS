@@ -14,7 +14,6 @@ import 'package:icahs_hwr/views/home/evaluation/evaluation_list_page.dart';
 import 'package:icahs_hwr/widgets/my_chip.dart';
 import 'package:icahs_hwr/widgets/my_list_tile.dart';
 import 'package:icahs_hwr/widgets/my_stat_card.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class BatchDetailPage extends StatefulWidget {
   const BatchDetailPage({super.key, required this.batchId});
@@ -73,7 +72,11 @@ class _BatchDetailPageState extends State<BatchDetailPage>
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return getCustomAppBar(context, title: "Batch Details");
+    return getCustomAppBar(
+      context,
+      title: "Batch Details",
+      icon: Image.asset('assets/icons/batches-icon.png', width: 30),
+    );
   }
 
   Widget _buildBatchInfoCard(BatchModel batch) {
@@ -153,6 +156,7 @@ class _BatchDetailPageState extends State<BatchDetailPage>
                 child: MyStatCard(
                   title: "Students",
                   count: batch.totalStudents.toString(),
+                  color: const Color.fromARGB(255, 221, 248, 228),
                   spacing: 15,
                   alignment: .center,
                   countColor: MyColorPalette.purple,
@@ -172,6 +176,7 @@ class _BatchDetailPageState extends State<BatchDetailPage>
                 child: MyStatCard(
                   title: "Today Attendance",
                   count: batch.attendance ?? "-- / --",
+                  color: const Color.fromARGB(255, 216, 238, 250),
                   spacing: 15,
                   alignment: .center,
                   countColor: MyColorPalette.purple,
@@ -192,6 +197,7 @@ class _BatchDetailPageState extends State<BatchDetailPage>
                 child: MyStatCard(
                   title: "Evaluations",
                   count: batch.totalEvaluations?.toString() ?? "--",
+                  color: const Color.fromARGB(255, 232, 221, 252),
                   spacing: 15,
                   alignment: .center,
                   countColor: MyColorPalette.purple,
@@ -207,6 +213,7 @@ class _BatchDetailPageState extends State<BatchDetailPage>
               Expanded(
                 child: MyStatCard(
                   title: "Reports",
+                  color: const Color.fromARGB(255, 248, 236, 224),
                   count: batch.totalReports?.toString() ?? "--",
                   spacing: 15,
                   alignment: .center,
@@ -229,7 +236,7 @@ class _BatchDetailPageState extends State<BatchDetailPage>
   Widget _buildRoutingCard(BatchModel batch) {
     final List<Map<String, dynamic>> items = [
       {
-        "icon": LucideIcons.users,
+        "icon": Image.asset('assets/icons/student-icon.png', width: 20),
         "title": "View Students",
         "onTap": () => Navigator.push(
           context,
@@ -243,7 +250,7 @@ class _BatchDetailPageState extends State<BatchDetailPage>
         ),
       },
       {
-        "icon": LucideIcons.calendarCheck,
+        "icon": Image.asset('assets/icons/attendance-icon.png', width: 20),
         "title": "Attendance",
         "onTap": () => Navigator.push(
           context,
@@ -251,7 +258,7 @@ class _BatchDetailPageState extends State<BatchDetailPage>
         ),
       },
       {
-        "icon": LucideIcons.clipboardList,
+        "icon": Image.asset('assets/icons/evaluation-icon.png', width: 20),
         "title": "Evaluation",
         "onTap": () => Navigator.push(
           context,
@@ -261,7 +268,7 @@ class _BatchDetailPageState extends State<BatchDetailPage>
         ),
       },
       {
-        "icon": LucideIcons.fileText,
+        "icon": Image.asset('assets/icons/report-icon.png', width: 25),
         "title": "Reports",
         "onTap": () => Navigator.push(
           context,
@@ -276,7 +283,7 @@ class _BatchDetailPageState extends State<BatchDetailPage>
     return Column(
       children: items.map((item) {
         return MyListTile(
-          leading: Icon(item["icon"], color: MyColorPalette.purple),
+          leading: item["icon"],
           title: item["title"],
           titleTextStyle: const TextStyle(
             fontSize: 16,
