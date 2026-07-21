@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icahs_hwr/controllers/navigation_controller.dart';
+import 'package:icahs_hwr/core/Utils/utils.dart';
 import 'package:icahs_hwr/core/my_color_palette.dart';
 import 'package:icahs_hwr/views/home/batches/batch_list_page.dart';
 import 'package:icahs_hwr/views/home/home_page.dart';
@@ -34,7 +35,9 @@ class _BottomNavPageState extends State<BottomNavPage> {
           ],
         );
       }),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: isAndroid()
+          ? FloatingActionButtonLocation.centerFloat
+          : FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12),
         decoration: const BoxDecoration(

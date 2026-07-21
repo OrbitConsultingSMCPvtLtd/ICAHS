@@ -51,27 +51,26 @@ class _AttendanceDetailPageState extends State<AttendanceDetailPage> {
     final delete = await deleteDialog(
       context,
       title: "Delete?",
-      content: "This Attendance record will be permanently deleted. Are you sure you want to delete it?",
+      content:
+          "This Attendance record will be permanently deleted. Are you sure you want to delete it?",
       onTap: () async {
-              var result = await _atten.deletAttendance(
-                widget.attnRecord.hwrAttendanceId,
-                widget.attnRecord.hwrBatchId,
-              );
+        var result = await _atten.deletAttendance(
+          widget.attnRecord.hwrAttendanceId,
+          widget.attnRecord.hwrBatchId,
+        );
 
-              showSnackBar(
-                result['status'].toString().toLowerCase().capitalize!,
-                result['message'],
-                color: result['status'] == "SUCCESS"
-                    ? MyColorPalette.success
-                    : MyColorPalette.error,
-              );
+        showSnackBar(
+          result['status'].toString().toLowerCase().capitalize!,
+          result['message'],
+          color: result['status'] == "SUCCESS"
+              ? MyColorPalette.success
+              : MyColorPalette.error,
+        );
 
-              if (!mounted) return;
-              Navigator.pop(context, true);
-            },
+        if (!mounted) return;
+        Navigator.pop(context, true);
+      },
     );
-
-
 
     if (delete == true && mounted) {
       Navigator.pop(context, true);

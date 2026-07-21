@@ -4,6 +4,7 @@ import 'package:icahs_hwr/controllers/auth_controller.dart';
 import 'package:icahs_hwr/controllers/dashboard_controller.dart';
 import 'package:icahs_hwr/core/my_color_palette.dart';
 import 'package:icahs_hwr/models/dashboard_stats.dart';
+import 'package:icahs_hwr/widgets/my_input_label.dart';
 import 'package:icahs_hwr/widgets/my_stat_card.dart';
 import 'package:marquee/marquee.dart';
 
@@ -36,7 +37,6 @@ class _HomePageState extends State<HomePage> {
     final screenWidth = MediaQuery.widthOf(context);
     return Scaffold(
       appBar: AppBar(
-        // backgroundColor: Colors.transparent,
         actionsPadding: const EdgeInsets.symmetric(horizontal: 26),
         title: Text(
           "Dashboard",
@@ -44,7 +44,6 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
       ),
-      // extendBodyBehindAppBar: true,
       body: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -132,6 +131,13 @@ class _HomePageState extends State<HomePage> {
                   ),
 
                   const SizedBox(height: 5),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: MyInputLabel(
+                      label: "Today's Overview",
+                      isRequired: false,
+                    ),
+                  ),
                   Obx(() {
                     if (_dashboard.isLoading.value) {
                       return SizedBox(
@@ -144,6 +150,14 @@ class _HomePageState extends State<HomePage> {
 
                     return _buildStatCards(_dashboard.stats);
                   }),
+                  // Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  //   child: MyInputLabel(
+                  //     label: "Quick Actions",
+                  //     isRequired: false,
+                  //   ),
+                  // ),
+                  // _buildQuickActionCardRow(),
                 ],
               ),
             ),
@@ -232,7 +246,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
 
-                /// Decorative Circle
                 Image.asset("assets/images/doctor2.png"),
               ],
             ),
@@ -244,10 +257,8 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildStatCards(DashboardStats stats) {
     return Column(
-      // spacing: 6,
       children: [
         Row(
-          // spacing: 6,
           children: [
             Expanded(
               child: MyStatCard(
@@ -275,7 +286,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         Row(
-          // spacing: 6,
           children: [
             Expanded(
               child: MyStatCard(
@@ -301,4 +311,94 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
+
+  // Widget _buildQuickActionCardRow() {
+  //   return SingleChildScrollView(
+  //     scrollDirection: Axis.horizontal,
+  //     child: Row(
+  //       mainAxisAlignment: .start,
+  //       crossAxisAlignment: .center,
+  //       children: [
+  //         _buildQuickActionCard(
+  //           title: "Mark Attendance",
+  //           icon: Image.asset('assets/icons/attendance-icon.png', width: 35),
+  //           gradientColors: [
+  //             Color.fromARGB(255, 62, 146, 255),
+  //             Color.fromARGB(255, 21, 21, 133),
+  //           ],
+  //           onTap: () {
+
+  //           },
+  //         ),
+  //         _buildQuickActionCard(
+  //           title: "Create Report",
+  //           icon: Image.asset('assets/icons/report-icon.png', width: 35),
+  //           gradientColors: [
+  //             Color.fromARGB(255, 250, 220, 123),
+  //             Color.fromARGB(255, 207, 108, 15),
+  //           ],
+  //         ),
+  //         _buildQuickActionCard(
+  //           title: "Add Evaluation",
+  //           icon: Image.asset('assets/icons/evaluation-icon.png', width: 35),
+  //           gradientColors: [
+  //             Color.fromARGB(255, 186, 189, 192),
+  //             Color.fromARGB(255, 69, 69, 70),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  // Widget _buildQuickActionCard({
+  //   required String title,
+  //   required Widget icon,
+  //   required List<Color> gradientColors,
+  //   void Function()? onTap,
+  // }) {
+  //   return Card(
+  //     color: MyColorPalette.white,
+  //     child: InkWell(
+  //       onTap: onTap,
+  //       radius: 35,
+  //       splashColor: MyColorPalette.lowOpacityPurple,
+  //       child: Padding(
+  //         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12),
+  //         child: ConstrainedBox(
+  //           constraints: BoxConstraints(
+  //             minWidth: 60,
+  //             maxWidth: 80,
+  //             minHeight: 80,
+  //             // maxHeight: 100,
+  //           ),
+  //           child: Column(
+  //             mainAxisSize: .min,
+  //             crossAxisAlignment: .center,
+  //             spacing: 8,
+  //             children: [
+  //               Container(
+  //                 padding: EdgeInsets.all(6),
+  //                 decoration: BoxDecoration(
+  //                   borderRadius: BorderRadius.circular(12),
+  //                   gradient: LinearGradient(
+  //                     begin: Alignment.topLeft,
+  //                     end: Alignment.bottomRight,
+  //                     colors: gradientColors,
+  //                   ),
+  //                 ),
+  //                 child: icon,
+  //               ),
+  //               Text(
+  //                 title,
+  //                 textAlign: TextAlign.center,
+  //                 style: TextStyle(fontSize: 12),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 }

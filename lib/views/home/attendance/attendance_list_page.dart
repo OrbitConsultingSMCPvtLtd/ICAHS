@@ -72,7 +72,7 @@ class _AttendanceListPageState extends State<AttendanceListPage> {
       foregroundColor: MyColorPalette.white,
       backgroundColor: MyColorPalette.purple,
       title: "Attendance",
-
+      icon: Hero(tag: "attendance", child: Image.asset('assets/icons/attendance-icon.png', width: 25)),
       hasDivider: false,
     );
   }

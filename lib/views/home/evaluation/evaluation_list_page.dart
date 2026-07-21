@@ -94,6 +94,7 @@ class _EvaluationListPageState extends State<EvaluationListPage> {
     return getCustomAppBar(
       context,
       title: "Evaluations",
+      icon: Hero(tag: "evaluation", child: Image.asset('assets/icons/evaluation-icon.png', width: 25)),
       foregroundColor: MyColorPalette.white,
       backgroundColor: MyColorPalette.purple,
       hasDivider: false,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icahs_hwr/controllers/auth_controller.dart';
 import 'package:icahs_hwr/controllers/navigation_controller.dart';
+import 'package:icahs_hwr/core/Utils/utils.dart';
 import 'package:icahs_hwr/core/helper.dart';
 import 'package:icahs_hwr/core/my_color_palette.dart';
 import 'package:icahs_hwr/widgets/my_input_label.dart';
@@ -19,48 +20,20 @@ class _ProfilePageState extends State<ProfilePage> {
   final NavigationController _nav = Get.find<NavigationController>();
 
   void _handleLogout() async {
-    final logout = await showAdaptiveDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog.adaptive(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        title: Text(
-          "Logout?",
-          style: TextStyle(
-            color: MyColorPalette.red,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text("Are you sure you want to logout?"),
-        actionsAlignment: MainAxisAlignment.end,
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context, false);
-            },
-            child: Text(
-              "Go back",
-              style: TextStyle(color: MyColorPalette.black),
-            ),
-          ),
+    final logout = await deleteDialog(
+      context,
+      title: "Logout?",
+      content: "Are you sure you want to logout?",
+      onTap: () async {
+        showSnackBar(
+          "Success",
+          "You have been logged out successfuly.",
+          color: MyColorPalette.success,
+        );
 
-          ElevatedButton(
-            onPressed: () async {
-              showSnackBar(
-                "Success",
-                "You have been logged out successfuly.",
-                color: MyColorPalette.success,
-              );
-
-              if (!context.mounted) return;
-              Navigator.pop(context, true);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: MyColorPalette.red,
-            ),
-            child: Text("Yes", style: TextStyle(color: MyColorPalette.white)),
-          ),
-        ],
-      ),
+        if (!mounted) return;
+        Navigator.pop(context, true);
+      },
     );
 
     if (logout == true) {
@@ -175,10 +148,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: TextStyle(fontSize: 26, color: MyColorPalette.white),
                   ),
                   const SizedBox(height: 5),
-                  // Text(
-                  //   _auth.user!.fullName,
-                  //   style: TextStyle(fontSize: 16, color: MyColorPalette.white),
-                  // ),
                   Text(
                     _auth.user!.username,
                     style: TextStyle(fontSize: 14, color: MyColorPalette.white),
@@ -191,112 +160,128 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: Container(
         color: Theme.of(context).scaffoldBackgroundColor,
-        child: Column(
-          crossAxisAlignment: .start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: MyInputLabel(
-                label: "Personal Information",
-                isRequired: false,
-                textColor: MyColorPalette.purple,
-                fontSize: 20,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: .start,
+            children: [
+              _buildInfoContainer(
+                title: "Personal Information",
+                child: Column(
+                  mainAxisSize: .min,
+                  crossAxisAlignment: .start,
+                  children: [
+                    _buildInfoRow("Full Name ", _auth.user!.fullName),
+                    const SizedBox(
+                      child: Divider(color: Color.fromRGBO(0, 0, 0, 0.1)),
+                    ),
+                    _buildInfoRow("Username ", _auth.user!.username),
+                    const SizedBox(
+                      child: Divider(color: Color.fromRGBO(0, 0, 0, 0.1)),
+                    ),
+                    _buildInfoRow("Email ", _auth.user!.email ?? "--"),
+                    const SizedBox(
+                      child: Divider(color: Color.fromRGBO(0, 0, 0, 0.1)),
+                    ),
+                    _buildInfoRow("Contact No.", _auth.user!.contactNo ?? "--"),
+                  ],
+                ),
               ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              padding: EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-                color: MyColorPalette.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Color.fromARGB(25, 0, 0, 0),
-                    blurRadius: 6,
-                    spreadRadius: 1,
-                    offset: Offset(0, 0),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: .min,
-                crossAxisAlignment: .start,
-                children: [
-                  Row(
-                    spacing: 10,
+              if (_auth.user!.isSupervisor)
+                _buildInfoContainer(
+                  title: "Supervisor Information",
+                  child: Column(
+                    mainAxisSize: .min,
+                    crossAxisAlignment: .start,
                     children: [
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          "Full Name ",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: MyColorPalette.textGrey,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          _auth.user!.fullName,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: MyColorPalette.black,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                      _buildInfoRow(
+                        "Hospital Name ",
+                        _auth.user!.hospitalName ?? "--",
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    child: Divider(color: Color.fromRGBO(0, 0, 0, 0.1)),
-                  ),
-                  Row(
-                    spacing: 10,
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          "Username ",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: MyColorPalette.textGrey,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          _auth.user!.username,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: MyColorPalette.black,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
+
+              const Divider(),
+              MyListTile(
+                leading: Icon(Icons.logout_rounded, color: MyColorPalette.red),
+                title: "Logout",
+                trailingIsChip: false,
+                trailing: IconButton(
+                  onPressed: _handleLogout,
+                  icon: Icon(Icons.chevron_right_rounded),
+                ),
+                horizontalMargin: 8,
+                borderRadius: 8,
+                alignment: .center,
+                onTap: _handleLogout,
               ),
-            ),
-            const Divider(),
-            MyListTile(
-              leading: Icon(Icons.logout_rounded, color: MyColorPalette.red),
-              title: "Logout",
-              trailingIsChip: false,
-              trailing: IconButton(
-                onPressed: _handleLogout,
-                icon: Icon(Icons.chevron_right_rounded),
-              ),
-              horizontalMargin: 8,
-              borderRadius: 8,
-              alignment: .center,
-              onTap: _handleLogout,
-            ),
-          ],
+
+              const SizedBox(height: kBottomNavigationBarHeight + 25),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildInfoContainer({required String title, required Widget child}) {
+    return Column(
+      mainAxisSize: .min,
+      crossAxisAlignment: .start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: MyInputLabel(
+            label: title,
+            isRequired: false,
+            textColor: MyColorPalette.purple,
+            fontSize: 20,
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          padding: EdgeInsets.all(12),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+            color: MyColorPalette.white,
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromARGB(25, 0, 0, 0),
+                blurRadius: 6,
+                spreadRadius: 1,
+                offset: Offset(0, 0),
+              ),
+            ],
+          ),
+          child: child,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(String title, String content) {
+    return Row(
+      spacing: 10,
+      children: [
+        Expanded(
+          flex: 2,
+          child: Text(
+            title,
+            style: TextStyle(fontSize: 16, color: MyColorPalette.textGrey),
+          ),
+        ),
+        Expanded(
+          flex: 3,
+          child: Text(
+            content,
+            style: TextStyle(
+              fontSize: 16,
+              color: MyColorPalette.black,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

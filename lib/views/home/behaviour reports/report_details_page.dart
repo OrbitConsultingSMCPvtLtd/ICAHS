@@ -36,24 +36,25 @@ class _ReportDetailsPageState extends State<ReportDetailsPage> {
     final delete = await deleteDialog(
       context,
       title: "Delete?",
-      content: "This Report record will be permanently deleted. Are you sure you want to delete it?",
+      content:
+          "This Report record will be permanently deleted. Are you sure you want to delete it?",
       onTap: () async {
-              var result = await _reportController.deletReport(
-                widget.batchID,
-                widget.reportID,
-              );
+        var result = await _reportController.deletReport(
+          widget.batchID,
+          widget.reportID,
+        );
 
-              showSnackBar(
-                result['status'].toString().toLowerCase().capitalize!,
-                result['message'],
-                color: result['status'] == "SUCCESS"
-                    ? MyColorPalette.success
-                    : MyColorPalette.error,
-              );
+        showSnackBar(
+          result['status'].toString().toLowerCase().capitalize!,
+          result['message'],
+          color: result['status'] == "SUCCESS"
+              ? MyColorPalette.success
+              : MyColorPalette.error,
+        );
 
-              if (!mounted) return;
-              Navigator.pop(context, true);
-            },
+        if (!mounted) return;
+        Navigator.pop(context, true);
+      },
     );
 
     if (delete == true && mounted) {
@@ -85,11 +86,7 @@ class _ReportDetailsPageState extends State<ReportDetailsPage> {
           children: [
             const SizedBox(height: 5),
             MyListTile(
-              leading: Icon(
-                LucideIcons.userRound,
-                color: MyColorPalette.purple,
-                size: 28,
-              ),
+              leading: Image.asset('assets/icons/student-icon.png', width: 25),
               title:
                   "${_reportController.reportDetail.value!.studentName.toLowerCase().capitalize} (STU${_reportController.reportDetail.value!.studentId})",
               sub2: _reportController.reportDetail.value!.batchName,
@@ -201,7 +198,10 @@ class _ReportDetailsPageState extends State<ReportDetailsPage> {
     return getCustomAppBar(
       context,
       title: "Report Details",
-      icon: Image.asset('assets/icons/report-icon.png', width: 25),
+      icon: Hero(
+        tag: "report",
+        child: Image.asset('assets/icons/report-icon.png', width: 25),
+      ),
       foregroundColor: MyColorPalette.white,
       backgroundColor: MyColorPalette.purple,
       actions: _auth.user!.isSupervisor && _batch.batchDetail.value!.isActive

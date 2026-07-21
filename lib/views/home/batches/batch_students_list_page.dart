@@ -63,6 +63,10 @@ class _BatchStudentsListPageState extends State<BatchStudentsListPage> {
     return getCustomAppBar(
       context,
       title: "Batch Students",
+      icon: Hero(
+        tag: "student",
+        child: Image.asset('assets/icons/student-icon.png', width: 25),
+      ),
       foregroundColor: MyColorPalette.white,
       backgroundColor: MyColorPalette.purple,
       // actions: [Icon(LucideIcons.plus, size: 30)],

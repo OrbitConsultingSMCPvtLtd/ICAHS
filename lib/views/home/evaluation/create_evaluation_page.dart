@@ -180,13 +180,14 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
   }
 
   void _handleButtonTap() async {
-    if (!_formKey.currentState!.validate()) {
-      print("fail");
+    try {
+      if (!_stepFormKeys.last.currentState!.validate()) {
+        return;
+      }
+    } on Exception catch (e) {
+      showSnackBar("Error", e.toString(), color: MyColorPalette.error);
       return;
     }
-
-    print("pass");
-
     evaluation['evaluation_date'] = dateController.text.trim();
 
     _handleRemarks();
@@ -561,7 +562,7 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
                 icon: Icon(LucideIcons.calendarDays),
               ),
               validator: (val) {
-                if (val == null) {
+                if (val == "" || val == null) {
                   return "Please select a date";
                 }
                 return null;
@@ -903,14 +904,30 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
               children: [
                 Expanded(
                   flex: 2,
-                  child: Text(
-                    "Score (1 ~ 5)",
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: MyColorPalette.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                  child: Stack(
+                    fit: StackFit.passthrough,
+                    children: [
+                      Text(
+                        "Score (1 ~ 5)",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: MyColorPalette.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 20,
+                        child: Text(
+                          "*",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: MyColorPalette.red,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
@@ -929,6 +946,7 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
             ),
             for (var i = 0; i < body.length; i++)
               Row(
+                crossAxisAlignment: .start,
                 spacing: 8,
                 children: [
                   Expanded(
@@ -950,10 +968,13 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
                             int.parse(val!);
                       },
                       validator: (val) {
-                        if (val == null) {
+                        bool chk =
+                            val == null || val.trim().isEmpty || val == "null";
+                        if (chk) {
                           return "Please select a score";
+                        } else {
+                          return null;
                         }
-                        return null;
                       },
                       elevation: 2,
                       maxMenuWidth: 150,

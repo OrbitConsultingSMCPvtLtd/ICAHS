@@ -236,7 +236,10 @@ class _BatchDetailPageState extends State<BatchDetailPage>
   Widget _buildRoutingCard(BatchModel batch) {
     final List<Map<String, dynamic>> items = [
       {
-        "icon": Image.asset('assets/icons/student-icon.png', width: 20),
+        "icon": Hero(
+          tag: "student",
+          child: Image.asset('assets/icons/student-icon.png', width: 20),
+        ),
         "title": "View Students",
         "onTap": () => Navigator.push(
           context,
@@ -250,7 +253,10 @@ class _BatchDetailPageState extends State<BatchDetailPage>
         ),
       },
       {
-        "icon": Image.asset('assets/icons/attendance-icon.png', width: 20),
+        "icon": Hero(
+          tag: "attendance",
+          child: Image.asset('assets/icons/attendance-icon.png', width: 20),
+        ),
         "title": "Attendance",
         "onTap": () => Navigator.push(
           context,
@@ -258,7 +264,10 @@ class _BatchDetailPageState extends State<BatchDetailPage>
         ),
       },
       {
-        "icon": Image.asset('assets/icons/evaluation-icon.png', width: 20),
+        "icon": Hero(
+          tag: "evaluation",
+          child: Image.asset('assets/icons/evaluation-icon.png', width: 20),
+        ),
         "title": "Evaluation",
         "onTap": () => Navigator.push(
           context,
@@ -268,7 +277,10 @@ class _BatchDetailPageState extends State<BatchDetailPage>
         ),
       },
       {
-        "icon": Image.asset('assets/icons/report-icon.png', width: 25),
+        "icon": Hero(
+          tag: "report",
+          child: Image.asset('assets/icons/report-icon.png', width: 25),
+        ),
         "title": "Reports",
         "onTap": () => Navigator.push(
           context,

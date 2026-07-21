@@ -12,8 +12,8 @@ class AuthController extends GetxController {
 
   @override
   void onInit() async {
-    await checkAuthStatus();
     super.onInit();
+    await checkAuthStatus();
   }
 
   final HttpService _http;

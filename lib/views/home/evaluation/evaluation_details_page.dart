@@ -386,7 +386,6 @@ class _EvaluationDetailsPageState extends State<EvaluationDetailsPage>
     return getCustomAppBar(
       context,
       title: "Evaluation Details",
-      icon: Image.asset('assets/icons/evaluation-icon.png', width: 25),
       foregroundColor: MyColorPalette.white,
       backgroundColor: MyColorPalette.purple,
       hasActionsPadding: false,

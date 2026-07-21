@@ -1,5 +1,3 @@
-import 'package:flutter/widgets.dart';
-
 class User {
   final String id;
   final String username;
@@ -46,20 +44,32 @@ class User {
         break;
       default:
     }
+    final roleKey = json['user_type_name'].toString().toLowerCase();
 
-    final roleKey = json['role'].toString().toLowerCase();
+    bool isChecking = json[roleKey] == null;
+
     return User(
       id: json['user_id'] ?? "",
       username: json['username'] ?? '',
       userType: json['user_type'] ?? 0,
       role: json['user_type_name'] ?? '',
-      empNo: json[roleKey][empIdKey] ?? "",
-      fullName: json[roleKey][fullNameKey] ?? '',
-      hospitalId: json[roleKey]['hospital_id'],
-      hospitalName: json[roleKey]['hospital_name'],
-      email: json[roleKey]['email'],
-      address: json[roleKey]['address'],
-      contactNo: json['contact_no'],
+      empNo: isChecking ? json[empIdKey] ?? "" : json[roleKey][empIdKey] ?? "",
+      fullName: isChecking
+          ? json[fullNameKey] ?? ""
+          : json[roleKey][fullNameKey] ?? "",
+      hospitalId: isChecking
+          ? json['hospital_id'] ?? ""
+          : json[roleKey]['hospital_id'] ?? "",
+      hospitalName: isChecking
+          ? json['hospital_name'] ?? ""
+          : json[roleKey]['hospital_name'] ?? "",
+      email: isChecking ? json['email'] ?? "" : json[roleKey]['email'] ?? "",
+      address: isChecking
+          ? json['address'] ?? ""
+          : json[roleKey]['address'] ?? "",
+      contactNo: isChecking
+          ? json['contact_no'] ?? ""
+          : json[roleKey]['contact_no'] ?? "",
       instituteId: json['institute_id'] ?? "",
       instituteName: json['institute_name'] ?? "",
     );

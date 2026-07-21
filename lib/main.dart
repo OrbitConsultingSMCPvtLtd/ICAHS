@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:icahs_hwr/core/auth_wrapper.dart';
 import 'package:icahs_hwr/core/dependancy_injection.dart';
+import 'package:icahs_hwr/views/splash_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
         textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
       ),
-      home: const AuthWrapper(),
+      home: const SplashScreen(),
     );
   }
 }
