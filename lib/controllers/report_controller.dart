@@ -37,6 +37,7 @@ class ReportController extends GetxController {
 
       var body = jsonDecode(res.body);
       hasMore = body['hasMore'];
+      printInfo(info: "has more: $hasMore");
       reports.assignAll(
         List<ReportModel>.from(
           (body['items'] as List).map((jsonData) {
@@ -48,6 +49,36 @@ class ReportController extends GetxController {
       printError(info: e.toString());
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> loadMoreReports(String batchId) async {
+    if (!hasMore) return;
+
+    try {
+      final user = authController.user!;
+      offset += 25;
+
+      var res = await _http.getRequest(
+        '/show_behaviour_list/${user.instituteId}/$batchId/${user.userType}/${user.id}',
+        {'offset': offset.toString()},
+      );
+
+      var body = jsonDecode(res.body);
+      hasMore = body['hasMore'];
+
+      reports.addAll(
+        List<ReportModel>.from(
+          (body['items'] as List).map((jsonData) {
+            return ReportModel.fromJson(jsonData);
+          }),
+        ),
+      );
+
+      return;
+    } catch (e) {
+      printError(info: e.toString());
+      return;
     }
   }
 

@@ -22,23 +22,39 @@ class BatchStudentsListPage extends StatefulWidget {
 }
 
 class _BatchStudentsListPageState extends State<BatchStudentsListPage> {
-  final TextEditingController _searchBarController = TextEditingController();
   final StudentController _student = Get.find<StudentController>();
+
+  final ScrollController _scrollController = ScrollController();
+  RxBool isLoadingMore = false.obs;
+
+  void _loadingStudents() async {
+    await _student.loadInitialStudents(widget.batchId);
+  }
+
+  void _scrollListenser() async {
+    if (isLoadingMore.value || _student.isLoading.value) return;
+
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 50) {
+      isLoadingMore.value = true;
+
+      await _student.loadMoreStudents(widget.batchId);
+
+      isLoadingMore.value = false;
+    }
+  }
 
   @override
   void initState() {
     _loadingStudents();
+    _scrollController.addListener(_scrollListenser);
     super.initState();
   }
 
   @override
   void dispose() {
-    _searchBarController.dispose();
+    _scrollController.dispose();
     super.dispose();
-  }
-
-  void _loadingStudents() async {
-    await _student.loadInitialStudents(widget.batchId);
   }
 
   @override
@@ -49,10 +65,7 @@ class _BatchStudentsListPageState extends State<BatchStudentsListPage> {
         appBar: _buildAppBar(context),
         body: Column(
           crossAxisAlignment: .start,
-          children: [
-            _buildBatchInfoCard(),
-            _buildStudentList(),
-          ],
+          children: [_buildBatchInfoCard(), _buildStudentList()],
         ),
       ),
     );
@@ -105,29 +118,39 @@ class _BatchStudentsListPageState extends State<BatchStudentsListPage> {
           return const Center(child: Text("No Students!"));
         }
 
-        return ListView.builder(
-          itemCount: _student.students.length,
-          itemBuilder: (context, index) {
-            var std = _student.students[index];
-            return MyListTile(
-              elevation: 0,
-              borderRadius: 6,
-              horizontalMargin: 8,
-              leading: Container(
-                padding: EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: const CircleAvatar(
-                  radius: 25,
-                  backgroundImage: AssetImage('assets/icons/profile.png'),
-                ),
-              ),
-              title: "STU${std.id}",
-              sub1: std.name,
-            );
+        return RefreshIndicator(
+          onRefresh: () async {
+            _loadingStudents();
           },
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: _scrollController,
+            slivers: [
+              SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  var std = _student.students[index];
+                  return MyListTile(
+                    elevation: 0,
+                    borderRadius: 6,
+                    horizontalMargin: 8,
+                    leading: Container(
+                      padding: EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const CircleAvatar(
+                        radius: 25,
+                        backgroundImage: AssetImage('assets/icons/profile.png'),
+                      ),
+                    ),
+                    title: "STU${std.id}",
+                    sub1: std.name,
+                  );
+                }, childCount: _student.students.length),
+              ),
+            ],
+          ),
         );
       }),
     );

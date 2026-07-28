@@ -14,14 +14,17 @@ class AttendanceController extends GetxController {
 
   final RxList<AttendanceModel> attendanceRecords = <AttendanceModel>[].obs;
   RxBool isLoading = false.obs;
+  bool hasMore = false;
+  int offset = 0;
+
   final RxList<StudentAttendanceModel> stdAttendanceRecords =
       <StudentAttendanceModel>[].obs;
   RxBool isStdLoading = false.obs;
+  bool stdHasMore = false;
+  int stdOffset = 0;
 
-  RxBool isNewAttendanceLoading = false.obs;
-
-  bool hasMore = false;
-  int offset = 0;
+  RxInt present = 0.obs;
+  RxInt absent = 0.obs;
 
   Future<void> loadInitialAttendanceRecords(String batchId) async {
     isLoading.value = true;
@@ -43,11 +46,40 @@ class AttendanceController extends GetxController {
           }),
         ),
       );
-
     } catch (e) {
       printError(info: e.toString());
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> loadMoreAttendanceRecords(String batchId) async {
+    if (!hasMore) return;
+
+    try {
+      var user = authController.user!;
+      offset += 25;
+
+      var res = await _http.getRequest(
+        '/show_attendance/${user.instituteId}/$batchId/${user.userType}/${user.id}',
+        {'offset': offset.toString()},
+      );
+
+      var body = jsonDecode(res.body);
+      hasMore = body['hasMore'];
+
+      attendanceRecords.addAll(
+        List<AttendanceModel>.from(
+          (body['items'] as List).map((jsonData) {
+            return AttendanceModel.fromJson(jsonData);
+          }),
+        ),
+      );
+
+      return;
+    } catch (e) {
+      printError(info: e.toString());
+      return;
     }
   }
 
@@ -58,7 +90,7 @@ class AttendanceController extends GetxController {
     isStdLoading.value = true;
     try {
       var user = authController.user!;
-      offset = 0;
+      stdOffset = 0;
 
       var res = await _http.getRequest(
         '/attendance_details/${user.instituteId}/$batchId/${user.userType}/${user.id}/$attenId',
@@ -66,7 +98,11 @@ class AttendanceController extends GetxController {
       );
 
       var body = jsonDecode(res.body);
-      hasMore = body['hasMore'];
+      stdHasMore = body['hasMore'];
+
+      present.value = body['items'][0]['present'];
+      absent.value = body['items'][0]['absent'];
+
       stdAttendanceRecords.assignAll(
         List<StudentAttendanceModel>.from(
           (body['items'] as List).map((jsonData) {
@@ -78,6 +114,38 @@ class AttendanceController extends GetxController {
       printError(info: e.toString());
     } finally {
       isStdLoading.value = false;
+    }
+  }
+
+  Future<void> loadMoreStudentAttendanceRecords(
+    String batchId,
+    String attenId,
+  ) async {
+    if (!stdHasMore) return;
+
+    try {
+      final user = authController.user!;
+      stdOffset += 25;
+
+      var res = await _http.getRequest(
+        '/attendance_details/${user.instituteId}/$batchId/${user.userType}/${user.id}/$attenId',
+        {'offset': stdOffset.toString()},
+      );
+
+      var body = jsonDecode(res.body);
+      stdHasMore = body['hasMore'];
+
+      stdAttendanceRecords.addAll(
+        List<StudentAttendanceModel>.from(
+          (body['items'] as List).map((jsonData) {
+            return StudentAttendanceModel.fromJson(jsonData);
+          }),
+        ),
+      );
+      return;
+    } catch (e) {
+      printError(info: e.toString());
+      return;
     }
   }
 

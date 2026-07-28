@@ -24,9 +24,26 @@ class AttendanceListPage extends StatefulWidget {
 class _AttendanceListPageState extends State<AttendanceListPage> {
   final AttendanceController _attendance = Get.find<AttendanceController>();
 
+  final ScrollController _scrollController = ScrollController();
+  RxBool isLoadingMore = false.obs;
+
+  void _scrollListenser() async {
+    if (isLoadingMore.value || _attendance.isLoading.value) return;
+
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 50) {
+      isLoadingMore.value = true;
+
+      await _attendance.loadMoreAttendanceRecords(widget.batch.hwrBatchId);
+
+      isLoadingMore.value = false;
+    }
+  }
+
   @override
   void initState() {
     _loadingAttendance();
+    _scrollController.addListener(_scrollListenser);
     super.initState();
   }
 
@@ -72,7 +89,10 @@ class _AttendanceListPageState extends State<AttendanceListPage> {
       foregroundColor: MyColorPalette.white,
       backgroundColor: MyColorPalette.purple,
       title: "Attendance",
-      icon: Hero(tag: "attendance", child: Image.asset('assets/icons/attendance-icon.png', width: 25)),
+      icon: Hero(
+        tag: "attendance",
+        child: Image.asset('assets/icons/attendance-icon.png', width: 25),
+      ),
       hasDivider: false,
     );
   }
@@ -91,42 +111,48 @@ class _AttendanceListPageState extends State<AttendanceListPage> {
         onRefresh: () async {
           _loadingAttendance();
         },
-        child: ListView.builder(
-          itemCount: _attendance.attendanceRecords.length,
-          itemBuilder: (context, index) {
-            var attd = _attendance.attendanceRecords[index];
-            var stds = attd.totalStudents;
-            return MyListTile(
-              elevation: 0,
-              borderRadius: 6,
-              horizontalMargin: 8,
-              title: formatDateToDDMMMMYYYY(attd.dated),
-              sub1: "${stds.toString()} ${stds == 1 ? "student" : "students"}",
-              trailing: Text(
-                attd.attendanceStatus,
-                style: TextStyle(
-                  color: getColorFromStatus(
+        child: CustomScrollView(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                var attd = _attendance.attendanceRecords[index];
+                var stds = attd.totalStudents;
+                return MyListTile(
+                  elevation: 0,
+                  borderRadius: 6,
+                  horizontalMargin: 8,
+                  title: formatDateToDDMMMMYYYY(attd.dated),
+                  sub1:
+                      "${stds.toString()} ${stds == 1 ? "student" : "students"}",
+                  trailing: Text(
                     attd.attendanceStatus,
-                    isBackground: false,
+                    style: TextStyle(
+                      color: getColorFromStatus(
+                        attd.attendanceStatus,
+                        isBackground: false,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              chipColor: getColorFromStatus(
-                attd.attendanceStatus,
-                isBackground: true,
-              ),
-              alignment: .center,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => AttendanceDetailPage(
-                    attnRecord: attd,
-                    batch: widget.batch,
+                  chipColor: getColorFromStatus(
+                    attd.attendanceStatus,
+                    isBackground: true,
                   ),
-                ),
-              ),
-            );
-          },
+                  alignment: .center,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AttendanceDetailPage(
+                        attnRecord: attd,
+                        batch: widget.batch,
+                      ),
+                    ),
+                  ),
+                );
+              }, childCount: _attendance.attendanceRecords.length),
+            ),
+          ],
         ),
       );
     });

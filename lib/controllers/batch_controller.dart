@@ -63,6 +63,34 @@ class BatchController extends GetxController {
     }
   }
 
+  Future<void> loadMoreBatches() async {
+    if (!hasMore) return;
+
+    try {
+      var user = authController.user!;
+      offset += 25;
+
+      var res = await _http.getRequest(
+        '/batches/${user.instituteId}/${user.userType}/${user.id}',
+        {'offset': offset.toString()},
+      );
+      var body = jsonDecode(res.body);
+      hasMore = body['hasMore'];
+
+      batches.addAll(
+        List<BatchModel>.from(
+          (body['items'] as List).map((jsonData) {
+            return BatchModel.fromJson(jsonData);
+          }),
+        ),
+      );
+      return;
+    } catch (e) {
+       printError(info: e.toString());
+      return;
+    }
+  }
+
   Future<void> getBatchDetails(String id) async {
     final user = authController.user!;
     try {

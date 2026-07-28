@@ -34,10 +34,23 @@ class _AttendanceDetailPageState extends State<AttendanceDetailPage> {
   final AttendanceController _atten = Get.find<AttendanceController>();
   final AuthController _auth = Get.find<AuthController>();
 
-  @override
-  void initState() {
-    loadingStudentAttendanceRecords();
-    super.initState();
+  final ScrollController _scrollController = ScrollController();
+  RxBool isLoadingMore = false.obs;
+
+  void _scrollListenser() async {
+    if (isLoadingMore.value || _atten.isStdLoading.value) return;
+
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 50) {
+      isLoadingMore.value = true;
+
+      await _atten.loadMoreStudentAttendanceRecords(
+        widget.attnRecord.hwrBatchId,
+        widget.attnRecord.hwrAttendanceId,
+      );
+
+      isLoadingMore.value = false;
+    }
   }
 
   void loadingStudentAttendanceRecords() async {
@@ -78,43 +91,71 @@ class _AttendanceDetailPageState extends State<AttendanceDetailPage> {
   }
 
   @override
+  void initState() {
+    loadingStudentAttendanceRecords();
+    _scrollController.addListener(_scrollListenser);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final attn = widget.attnRecord;
     return Scaffold(
       appBar: _buildAppBar(context),
-      body: Column(
-        children: [
-          const SizedBox(height: 10),
-          MyListTile(
-            leading: Icon(
-              CupertinoIcons.calendar_today,
-              color: MyColorPalette.purple,
-              size: 28,
-            ),
-            color: Colors.transparent,
-            title: formatDateToDDMMMMYYYY(attn.dated),
-            sub1: attn.batchName,
-            sub2: widget.batch.hospitalName,
-            trailing: Text(
-              attn.attendanceStatus,
-              style: TextStyle(
-                color: getColorFromStatus(
-                  attn.attendanceStatus,
-                  isBackground: false,
-                ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          loadingStudentAttendanceRecords();
+          setState(() {});
+        },
+        child: CustomScrollView(
+          controller: ScrollController(),
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Column(
+                mainAxisSize: .min,
+                children: [
+                  const SizedBox(height: 10),
+                  MyListTile(
+                    leading: Icon(
+                      CupertinoIcons.calendar_today,
+                      color: MyColorPalette.purple,
+                      size: 28,
+                    ),
+                    color: Colors.transparent,
+                    title: formatDateToDDMMMMYYYY(attn.dated),
+                    sub1: attn.batchName,
+                    sub2: widget.batch.hospitalName,
+                    trailing: Text(
+                      attn.attendanceStatus,
+                      style: TextStyle(
+                        color: getColorFromStatus(
+                          attn.attendanceStatus,
+                          isBackground: false,
+                        ),
+                      ),
+                    ),
+                    chipColor: getColorFromStatus(
+                      attn.attendanceStatus,
+                      isBackground: true,
+                    ),
+                    elevation: 0,
+                  ),
+                  const SizedBox(height: 10),
+                  _buildAttendanceStatCards(),
+                  const SizedBox(height: 10),
+                ],
               ),
             ),
-            chipColor: getColorFromStatus(
-              attn.attendanceStatus,
-              isBackground: true,
-            ),
-            elevation: 0,
-          ),
-          const SizedBox(height: 10),
-          _buildAttendanceStatCards(),
-          const SizedBox(height: 10),
-          _buildStudentAttendanceList(),
-        ],
+            _buildStudentAttendanceList(),
+          ],
+        ),
       ),
       floatingActionButton: canCreateOrEdit()
           ? FloatingActionButton(
@@ -170,30 +211,38 @@ class _AttendanceDetailPageState extends State<AttendanceDetailPage> {
         spacing: 10,
         children: [
           Expanded(
-            child: MyStatCard(
-              title: "Present",
-              count: widget.attnRecord.present.toString(),
-              elevation: 0,
-              spacing: 10,
-              alignment: .center,
-              countFontSize: 36,
-              color: MyColorPalette.lowOpacityGreen,
-              titleColor: MyColorPalette.darkGreen,
-              countColor: MyColorPalette.darkGreen,
-            ),
+            child: Obx(() {
+              return MyStatCard(
+                title: "Present",
+                count: _atten.present.value == 0
+                    ? widget.attnRecord.present.toString()
+                    : _atten.present.value.toString(),
+                elevation: 0,
+                spacing: 10,
+                alignment: .center,
+                countFontSize: 36,
+                color: MyColorPalette.lowOpacityGreen,
+                titleColor: MyColorPalette.darkGreen,
+                countColor: MyColorPalette.darkGreen,
+              );
+            }),
           ),
           Expanded(
-            child: MyStatCard(
-              title: "Absent",
-              count: widget.attnRecord.absent.toString(),
-              elevation: 0,
-              spacing: 10,
-              alignment: .center,
-              countFontSize: 36,
-              color: MyColorPalette.lowOpacityRed,
-              titleColor: MyColorPalette.darkRed,
-              countColor: MyColorPalette.darkRed,
-            ),
+            child: Obx(() {
+              return MyStatCard(
+                title: "Absent",
+                count: _atten.absent.value == 0
+                    ? widget.attnRecord.absent.toString()
+                    : _atten.absent.value.toString(),
+                elevation: 0,
+                spacing: 10,
+                alignment: .center,
+                countFontSize: 36,
+                color: MyColorPalette.lowOpacityRed,
+                titleColor: MyColorPalette.darkRed,
+                countColor: MyColorPalette.darkRed,
+              );
+            }),
           ),
           Expanded(
             child: MyStatCard(
@@ -216,59 +265,58 @@ class _AttendanceDetailPageState extends State<AttendanceDetailPage> {
   Widget _buildStudentAttendanceList() {
     return Obx(() {
       if (_atten.isStdLoading.value) {
-        return Expanded(
-          child: const Center(child: CircularProgressIndicator.adaptive()),
+        return const SliverFillRemaining(
+          child: Center(child: CircularProgressIndicator.adaptive()),
         );
       }
 
       if (_atten.stdAttendanceRecords.isEmpty) {
-        return Expanded(child: const Center(child: Text("No Records Found!")));
+        return const SliverFillRemaining(
+          child: Center(child: Text("No Records Found!")),
+        );
       }
 
-      return Expanded(
-        child: ListView.builder(
-          itemCount: _atten.stdAttendanceRecords.length,
-          itemBuilder: (context, index) {
-            var attd = _atten.stdAttendanceRecords[index];
-            return MyListTile(
-              elevation: 0,
-              borderRadius: 6,
-              horizontalMargin: 8,
-              leading: Container(
-                padding: EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: const CircleAvatar(
-                  backgroundImage: AssetImage('assets/icons/profile.png'),
-                ),
+      return SliverList(
+        delegate: SliverChildBuilderDelegate((context, index) {
+          var attd = _atten.stdAttendanceRecords[index];
+          return MyListTile(
+            elevation: 0,
+            borderRadius: 6,
+            horizontalMargin: 8,
+            leading: Container(
+              padding: EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
               ),
-              alignment: .center,
-              title:
-                  "${attd.studentName.toLowerCase().capitalize} (STU${attd.studentId})",
-              sub2: attd.remarks,
-              trailing: Center(
-                child: Text(
-                  attd.studentStatus,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: getColorFromStatus(
-                      attd.studentStatus,
-                      isBackground: false,
-                    ),
+              child: const CircleAvatar(
+                backgroundImage: AssetImage('assets/icons/profile.png'),
+              ),
+            ),
+            alignment: .center,
+            title:
+                "${attd.studentName.toLowerCase().capitalize} (STU${attd.studentId})",
+            sub2: attd.remarks,
+            trailing: Center(
+              child: Text(
+                attd.studentStatus,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: getColorFromStatus(
+                    attd.studentStatus,
+                    isBackground: false,
                   ),
                 ),
               ),
-              chipColor: getColorFromStatus(
-                attd.studentStatus,
-                isBackground: true,
-              ),
-              titleTextStyle: TextStyle(fontSize: 16),
-            );
-          },
-        ),
+            ),
+            chipColor: getColorFromStatus(
+              attd.studentStatus,
+              isBackground: true,
+            ),
+            titleTextStyle: TextStyle(fontSize: 16),
+          );
+        }, childCount: _atten.stdAttendanceRecords.length),
       );
     });
   }

@@ -25,14 +25,8 @@ class _ReportListPageState extends State<ReportListPage> {
   final ReportController _report = Get.find<ReportController>();
   final BatchController _batch = Get.find<BatchController>();
 
-  @override
-  void initState() {
-    super.initState();
-    loadingReports();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _report.loadLovs();
-    });
-  }
+  final ScrollController _scrollController = ScrollController();
+  RxBool isLoadingMore = false.obs;
 
   void loadingReports() async {
     await _report.loadInitialReports(widget.batchId);
@@ -47,6 +41,35 @@ class _ReportListPageState extends State<ReportListPage> {
     );
   }
 
+  void _scrollListenser() async {
+    if (isLoadingMore.value || _report.isLoading.value) return;
+
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 50) {
+      isLoadingMore.value = true;
+
+      await _report.loadMoreReports(widget.batchId);
+
+      isLoadingMore.value = false;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_scrollListenser);
+    loadingReports();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _report.loadLovs();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,14 +78,11 @@ class _ReportListPageState extends State<ReportListPage> {
           loadingReports();
         },
         child: CustomScrollView(
-          slivers: [
-            _buildSliverAppBar(),
-            SliverFillRemaining(child: _buildReportsList()),
-          ],
+          controller: _scrollController,
+          slivers: [_buildSliverAppBar(), _buildReportsList()],
         ),
       ),
-      floatingActionButton:
-         canCreateOrEdit()
+      floatingActionButton: canCreateOrEdit()
           ? FloatingActionButton.extended(
               onPressed: () {
                 Navigator.push(
@@ -190,39 +210,51 @@ class _ReportListPageState extends State<ReportListPage> {
   Widget _buildReportsList() {
     return Obx(() {
       if (_report.isLoading.value) {
-        return const Center(child: CircularProgressIndicator.adaptive());
+        return const SliverFillRemaining(
+          child: Center(child: CircularProgressIndicator.adaptive()),
+        );
       }
 
       if (_report.reports.isEmpty) {
-        return const Center(child: Text("No Records Found!"));
+        return const SliverFillRemaining(
+          child: Center(child: Text("No Records Found!")),
+        );
       }
 
-      return ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: _report.reports.length,
-        itemBuilder: (context, index) {
-          var report = _report.reports[index];
-          return MyListTile(
-            elevation: 0,
-            borderRadius: 6,
-            horizontalMargin: 8,
-            title:
-                "${report.studentName.toLowerCase().capitalize} (STU${report.studentId})",
-            sub2: formatDateToDDMMMMYYYY(report.reportDate),
-            trailing: Text(
-              report.severity,
-              style: TextStyle(
-                color: getColorFromStatus(report.severity, isBackground: false),
+      return SliverToBoxAdapter(
+        child: ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _report.reports.length,
+          itemBuilder: (context, index) {
+            var report = _report.reports[index];
+            return MyListTile(
+              elevation: 0,
+              borderRadius: 6,
+              horizontalMargin: 8,
+              title:
+                  "${report.studentName.toLowerCase().capitalize} (STU${report.studentId})",
+              sub2: formatDateToDDMMMMYYYY(report.reportDate),
+              trailing: Text(
+                report.severity,
+                style: TextStyle(
+                  color: getColorFromStatus(
+                    report.severity,
+                    isBackground: false,
+                  ),
+                ),
               ),
-            ),
-            chipColor: getColorFromStatus(report.severity, isBackground: true),
-            alignment: .center,
-            onTap: () {
-              _handleOnTap(widget.batchId, report.reportId);
-            },
-          );
-        },
+              chipColor: getColorFromStatus(
+                report.severity,
+                isBackground: true,
+              ),
+              alignment: .center,
+              onTap: () {
+                _handleOnTap(widget.batchId, report.reportId);
+              },
+            );
+          },
+        ),
       );
     });
   }

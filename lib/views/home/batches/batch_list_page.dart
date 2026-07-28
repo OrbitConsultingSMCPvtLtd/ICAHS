@@ -21,12 +21,14 @@ class _BatchListPageState extends State<BatchListPage>
   late final TabController _tabs;
   final BatchController _batch = Get.find<BatchController>();
 
-  @override
-  void initState() {
-    _tabs = TabController(length: 3, vsync: this);
-    loadingBatches();
-    super.initState();
-  }
+  final ScrollController allScrollController = ScrollController();
+  RxBool isAllLoadingMore = false.obs;
+
+  final ScrollController activeScrollController = ScrollController();
+  RxBool isActiveLoadingMore = false.obs;
+
+  final ScrollController inactiveScrollController = ScrollController();
+  RxBool isInactiveLoadingMore = false.obs;
 
   Future<void> loadingBatches() async {
     await _batch.loadInitialBatches();
@@ -37,6 +39,44 @@ class _BatchListPageState extends State<BatchListPage>
       context,
       MaterialPageRoute(builder: (_) => BatchDetailPage(batchId: batchId)),
     );
+  }
+
+  void _scrollListenser(RxBool loading, ScrollController controller) async {
+    if (loading.value || _batch.isLoading.value) return;
+
+    if (controller.position.pixels >=
+        controller.position.maxScrollExtent - 50) {
+      loading.value = true;
+
+      await _batch.loadMoreBatches();
+
+      loading.value = false;
+    }
+  }
+
+  @override
+  void initState() {
+    _tabs = TabController(length: 3, vsync: this);
+    allScrollController.addListener(() {
+      _scrollListenser(isAllLoadingMore, allScrollController);
+    });
+    activeScrollController.addListener(() {
+      _scrollListenser(isActiveLoadingMore, activeScrollController);
+    });
+    inactiveScrollController.addListener(() {
+      _scrollListenser(isInactiveLoadingMore, inactiveScrollController);
+    });
+    loadingBatches();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _tabs.dispose();
+    allScrollController.dispose();
+    activeScrollController.dispose();
+    inactiveScrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -160,35 +200,39 @@ class _BatchListPageState extends State<BatchListPage>
 
           return RefreshIndicator(
             onRefresh: onRefresh,
-            child: ListView.builder(
-              itemCount: _batch.batches.length,
-              itemBuilder: (context, index) {
-                final batch = _batch.batches[index];
-
-                return MyListTile(
-                  title: batch.batchName,
-                  sub1: batch.hospitalName,
-                  sub2:
-                      "${formatDateToDDMMMMYYYY(batch.startDate)} - ${formatDateToDDMMMMYYYY(batch.endDate)}",
-                  sub3: startEndTime(batch.startTime, batch.endTime),
-                  trailing: Text(
-                    batch.status == "Y" ? "Active" : "Inactive",
-                    style: TextStyle(
-                      color: getColorFromStatus(
-                        batch.status,
-                        isBackground: false,
+            child: CustomScrollView(
+              controller: allScrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final batch = _batch.batches[index];
+                    return MyListTile(
+                      title: batch.batchName,
+                      sub1: batch.hospitalName,
+                      sub2:
+                          "${formatDateToDDMMMMYYYY(batch.startDate)} - ${formatDateToDDMMMMYYYY(batch.endDate)}",
+                      sub3: startEndTime(batch.startTime, batch.endTime),
+                      trailing: Text(
+                        batch.status == "Y" ? "Active" : "Inactive",
+                        style: TextStyle(
+                          color: getColorFromStatus(
+                            batch.status,
+                            isBackground: false,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  chipColor: getColorFromStatus(
-                    batch.status,
-                    isBackground: true,
-                  ),
-                  onTap: () {
-                    _handleListTileOnTap(batch.hwrBatchId);
-                  },
-                );
-              },
+                      chipColor: getColorFromStatus(
+                        batch.status,
+                        isBackground: true,
+                      ),
+                      onTap: () {
+                        _handleListTileOnTap(batch.hwrBatchId);
+                      },
+                    );
+                  }, childCount: _batch.batches.length),
+                ),
+              ],
             ),
           );
 
@@ -199,30 +243,33 @@ class _BatchListPageState extends State<BatchListPage>
 
           return RefreshIndicator(
             onRefresh: onRefresh,
-            child: ListView.builder(
-              itemCount: _batch.activeBatches.length,
-              itemBuilder: (context, index) {
-                final batch = _batch.activeBatches[index];
-                return MyListTile(
-                  title: batch.batchName,
-                  sub1: batch.hospitalName,
-                  sub2:
-                      "${formatDateToDDMMMMYYYY(batch.startDate)} - ${formatDateToDDMMMMYYYY(batch.endDate)}",
-                  sub3: startEndTime(batch.startTime, batch.endTime),
-                  trailing: Text(
-                    "Active",
-                    style: TextStyle(color: MyColorPalette.darkGreen),
-                  ),
-
-                  chipColor: MyColorPalette.lowOpacityGreen,
-                  onTap: () {
-                    _handleListTileOnTap(batch.hwrBatchId);
-                  },
-                );
-              },
+            child: CustomScrollView(
+              controller: activeScrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final batch = _batch.activeBatches[index];
+                    return MyListTile(
+                      title: batch.batchName,
+                      sub1: batch.hospitalName,
+                      sub2:
+                          "${formatDateToDDMMMMYYYY(batch.startDate)} - ${formatDateToDDMMMMYYYY(batch.endDate)}",
+                      sub3: startEndTime(batch.startTime, batch.endTime),
+                      trailing: Text(
+                        "Active",
+                        style: TextStyle(color: MyColorPalette.darkGreen),
+                      ),
+                      chipColor: MyColorPalette.lowOpacityGreen,
+                      onTap: () {
+                        _handleListTileOnTap(batch.hwrBatchId);
+                      },
+                    );
+                  }, childCount: _batch.activeBatches.length),
+                ),
+              ],
             ),
           );
-
         case "inactive":
           if (_batch.inactiveBatches.isEmpty) {
             return const Center(child: Text("No Inactive batches!"));
@@ -230,27 +277,31 @@ class _BatchListPageState extends State<BatchListPage>
 
           return RefreshIndicator(
             onRefresh: onRefresh,
-            child: ListView.builder(
-              itemCount: _batch.inactiveBatches.length,
-              itemBuilder: (context, index) {
-                final batch = _batch.inactiveBatches[index];
-
-                return MyListTile(
-                  title: batch.batchName,
-                  sub1: batch.hospitalName,
-                  sub2:
-                      "${formatDateToDDMMMMYYYY(batch.startDate)} - ${formatDateToDDMMMMYYYY(batch.endDate)}",
-                  sub3: startEndTime(batch.startTime, batch.endTime),
-                  trailing: Text(
-                    "Inactive",
-                    style: TextStyle(color: MyColorPalette.darkRed),
-                  ),
-                  chipColor: MyColorPalette.lowOpacityRed,
-                  onTap: () {
-                    _handleListTileOnTap(batch.hwrBatchId);
-                  },
-                );
-              },
+            child: CustomScrollView(
+              controller: inactiveScrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final batch = _batch.inactiveBatches[index];
+                    return MyListTile(
+                      title: batch.batchName,
+                      sub1: batch.hospitalName,
+                      sub2:
+                          "${formatDateToDDMMMMYYYY(batch.startDate)} - ${formatDateToDDMMMMYYYY(batch.endDate)}",
+                      sub3: startEndTime(batch.startTime, batch.endTime),
+                      trailing: Text(
+                        "Inactive",
+                        style: TextStyle(color: MyColorPalette.darkRed),
+                      ),
+                      chipColor: MyColorPalette.lowOpacityRed,
+                      onTap: () {
+                        _handleListTileOnTap(batch.hwrBatchId);
+                      },
+                    );
+                  }, childCount: _batch.inactiveBatches.length),
+                ),
+              ],
             ),
           );
 

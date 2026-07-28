@@ -21,14 +21,37 @@ class EvaluationListPage extends StatefulWidget {
 
 class _EvaluationListPageState extends State<EvaluationListPage> {
   final EvaluationController _eval = Get.find<EvaluationController>();
+
+  final ScrollController _scrollController = ScrollController();
+  RxBool isLoadingMore = false.obs;
+
+  void _scrollListenser() async {
+    if (isLoadingMore.value || _eval.isLoading.value) return;
+
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 50) {
+      isLoadingMore.value = true;
+
+      await _eval.loadMoreEvaluations(widget.batchId);
+
+      isLoadingMore.value = false;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _loadingEvaluations();
-
+    _scrollController.addListener(_scrollListenser);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _eval.loadLovs();
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _loadingEvaluations() async {
@@ -69,8 +92,7 @@ class _EvaluationListPageState extends State<EvaluationListPage> {
         },
         child: _buildEvaluationList(),
       ),
-      floatingActionButton:
-          canCreateOrEdit()
+      floatingActionButton: canCreateOrEdit()
           ? FloatingActionButton.extended(
               onPressed: () {
                 Navigator.push(
@@ -94,7 +116,10 @@ class _EvaluationListPageState extends State<EvaluationListPage> {
     return getCustomAppBar(
       context,
       title: "Evaluations",
-      icon: Hero(tag: "evaluation", child: Image.asset('assets/icons/evaluation-icon.png', width: 25)),
+      icon: Hero(
+        tag: "evaluation",
+        child: Image.asset('assets/icons/evaluation-icon.png', width: 25),
+      ),
       foregroundColor: MyColorPalette.white,
       backgroundColor: MyColorPalette.purple,
       hasDivider: false,
@@ -111,32 +136,44 @@ class _EvaluationListPageState extends State<EvaluationListPage> {
         return const Center(child: Text("No Records Found!"));
       }
 
-      return ListView.builder(
-        itemCount: _eval.evaluations.length,
-        itemBuilder: (context, index) {
-          var eval = _eval.evaluations[index];
-          return MyListTile(
-            elevation: 0,
-            borderRadius: 6,
-            horizontalMargin: 8,
-            title:
-                "${eval.studentName.toLowerCase().capitalize} (STU${eval.studentId})",
-            sub2: formatDateToDDMMMMYYYY(eval.evaluationDate),
-            trailing: Text(
-              eval.marks,
-              style: TextStyle(
-                color: _getChipTextColor(eval.percentage),
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-            trailingIsChip: false,
-            alignment: .center,
-            onTap: () {
-              _handleOnTap(widget.batchId, eval.evaluationId);
-            },
-          );
+      return RefreshIndicator(
+        onRefresh: () async {
+          _loadingEvaluations();
         },
+        child: CustomScrollView(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                var eval = _eval.evaluations[index];
+                return MyListTile(
+                  elevation: 0,
+                  borderRadius: 6,
+                  horizontalMargin: 8,
+                  title:
+                      "${eval.studentName.toLowerCase().capitalize} (STU${eval.studentId})",
+                  sub2: formatDateToDDMMMMYYYY(eval.evaluationDate),
+                  trailing: Text(
+                    eval.marks,
+                    style: TextStyle(
+                      color: _getChipTextColor(eval.percentage),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  trailingIsChip: false,
+                  alignment: .center,
+                  onTap: () {
+                    _handleOnTap(widget.batchId, eval.evaluationId);
+                  },
+                );
+              }, childCount: _eval.evaluations.length),
+            ),
+
+            SliverToBoxAdapter(child: const SizedBox(height: 10)),
+          ],
+        ),
       );
     });
   }

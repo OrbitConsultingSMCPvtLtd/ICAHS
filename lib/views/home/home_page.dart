@@ -141,7 +141,7 @@ class _HomePageState extends State<HomePage> {
                   Obx(() {
                     if (_dashboard.isLoading.value) {
                       return SizedBox(
-                        height: MediaQuery.heightOf(context) * 0.8,
+                        height: MediaQuery.heightOf(context) * 0.5,
                         child: Center(
                           child: CircularProgressIndicator.adaptive(),
                         ),

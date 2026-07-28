@@ -12,7 +12,6 @@ class StudentController extends GetxController {
   final AuthController authController;
 
   final RxList<StudentModel> students = <StudentModel>[].obs;
-
   RxBool isLoading = false.obs;
 
   bool hasMore = false;
@@ -47,11 +46,38 @@ class StudentController extends GetxController {
           }),
         ),
       );
-
     } catch (e) {
       printError(info: e.toString());
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> loadMoreStudents(String batchId) async {
+    if (!hasMore) return;
+
+    try {
+      final user = authController.user!;
+      offset += 25;
+
+      var res = await _http.getRequest(
+        '/batch_student_list/${user.instituteId}/$batchId/${user.userType}/${user.id}',
+        {'offset': offset.toString()},
+      );
+
+      var body = jsonDecode(res.body);
+      hasMore = body['hasMore'];
+
+      students.addAll(
+        List<StudentModel>.from(
+          (body['items'] as List).map((jsonData) {
+            return StudentModel.fromJson(jsonData);
+          }),
+        ),
+      );
+    } catch (e) {
+      printError(info: e.toString());
+      return;
     }
   }
 }

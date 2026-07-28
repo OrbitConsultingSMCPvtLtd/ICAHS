@@ -43,11 +43,39 @@ class EvaluationController extends GetxController {
           }),
         ),
       );
-
     } catch (e) {
       printError(info: e.toString());
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> loadMoreEvaluations(String batchId) async {
+    if (!hasMore) return;
+
+    try {
+      final user = authController.user!;
+      offset += 25;
+
+      var res = await _http.getRequest(
+        '/show_evaluation_list/${user.instituteId}/$batchId/${user.userType}/${user.id}',
+        {'offset': offset.toString()},
+      );
+
+      var body = jsonDecode(res.body);
+      hasMore = body['hasMore'];
+
+      evaluations.addAll(
+        List<EvaluationModel>.from(
+          (body['items'] as List).map((jsonData) {
+            return EvaluationModel.fromJson(jsonData);
+          }),
+        ),
+      );
+      return;
+    } catch (e) {
+      printError(info: e.toString());
+      return;
     }
   }
 
