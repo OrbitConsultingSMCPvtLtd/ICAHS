@@ -62,11 +62,6 @@ class EvaluationController extends GetxController {
     String batchId,
     String evaluationId,
   ) async {
-    // if (evaluationDetail.value != null &&
-    //     evaluationDetail.value!.evaluationId == evaluationId &&
-    //     evaluationDetail.value!.hwrBatchId == batchId) {
-    //   return;
-    // }
     final user = authController.user!;
     try {
       isDetailLoading.value = true;

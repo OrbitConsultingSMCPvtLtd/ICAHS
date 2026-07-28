@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Hospital Ward Rotation',
+      themeMode: ThemeMode.light,
       theme: ThemeData(
         appBarTheme: AppBarThemeData(
           backgroundColor: const Color.fromARGB(255, 247, 247, 247),

@@ -16,12 +16,10 @@ class EvaluationScoreRow extends StatelessWidget {
     super.key,
     required this.controller,
     required this.label,
-    // required this.maxMenuWidth,
   });
 
   final TextEditingController controller;
   final String label;
-  // final double maxMenuWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -41,11 +39,9 @@ class EvaluationScoreRow extends StatelessWidget {
               color: MyColorPalette.white,
               borderRadius: 8,
               menuColor: const Color.fromARGB(255, 244, 245, 252),
-              // onSelected: onSelected,
               textAlign: TextAlign.center,
               labelStyle: TextStyle(fontSize: 16),
               elevation: 2,
-              // maxMenuWidth: maxMenuWidth,
             ),
           ),
         ),

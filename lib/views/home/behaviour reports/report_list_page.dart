@@ -114,7 +114,6 @@ class _ReportListPageState extends State<ReportListPage> {
               ],
               stops: [0.0, 0.55, 1.0],
             ),
-            // borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
           child: Center(
             child: Stack(

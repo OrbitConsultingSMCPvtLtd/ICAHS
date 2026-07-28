@@ -82,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment:
-                  MainAxisAlignment.start, // Changed from .center
+                  MainAxisAlignment.start,
               children: [
                 SizedBox(height: kToolbarHeight),
                 Image.asset('assets/icons/heart.png'),
@@ -120,7 +120,6 @@ class _LoginPageState extends State<LoginPage> {
                 Image.asset('assets/icons/building.png', width: 280),
                 Container(
                   width: double.infinity,
-                  // Remove fixed height constraint
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -148,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 10),
                       _buildForm(),
-                      SizedBox(height: 10), // Add bottom padding
+                      SizedBox(height: 10), 
                       Center(
                         child: Text(
                           'Version 1.0.0',

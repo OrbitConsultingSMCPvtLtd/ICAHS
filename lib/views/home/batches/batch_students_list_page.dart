@@ -51,7 +51,6 @@ class _BatchStudentsListPageState extends State<BatchStudentsListPage> {
           crossAxisAlignment: .start,
           children: [
             _buildBatchInfoCard(),
-            // _buildSearchBar(),
             _buildStudentList(),
           ],
         ),
@@ -69,7 +68,6 @@ class _BatchStudentsListPageState extends State<BatchStudentsListPage> {
       ),
       foregroundColor: MyColorPalette.white,
       backgroundColor: MyColorPalette.purple,
-      // actions: [Icon(LucideIcons.plus, size: 30)],
       hasDivider: false,
     );
   }
@@ -95,39 +93,6 @@ class _BatchStudentsListPageState extends State<BatchStudentsListPage> {
       ),
     );
   }
-
-  // Widget _buildSearchBar() {
-  //   return Container(
-  //     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-
-  //     child: Row(
-  //       spacing: 5,
-  //       children: [
-  //         Expanded(
-  //           flex: 5,
-  //           child: MyTextField(
-  //             controller: _searchBarController,
-  //             hint: "Search students...",
-  //             borderRadius: BorderRadius.circular(16),
-  //             fillColor: MyColorPalette.white,
-  //             icon: Icon(LucideIcons.search, color: MyColorPalette.darkPurple),
-  //           ),
-  //         ),
-  //         Expanded(
-  //           child: MyButton(
-  //             onTap: () {},
-
-  //             color: MyColorPalette.white,
-  //             child: Icon(
-  //               LucideIcons.listFilter,
-  //               color: MyColorPalette.darkPurple,
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _buildStudentList() {
     return Expanded(

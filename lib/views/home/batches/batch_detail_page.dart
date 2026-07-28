@@ -147,10 +147,8 @@ class _BatchDetailPageState extends State<BatchDetailPage>
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 12),
       child: Column(
-        // spacing: 2,
         children: [
           Row(
-            // spacing: 2,
             children: [
               Expanded(
                 child: MyStatCard(
@@ -191,7 +189,6 @@ class _BatchDetailPageState extends State<BatchDetailPage>
             ],
           ),
           Row(
-            // spacing: 2,
             children: [
               Expanded(
                 child: MyStatCard(
@@ -289,7 +286,6 @@ class _BatchDetailPageState extends State<BatchDetailPage>
           ),
         ),
       },
-      // {"icon": LucideIcons.squarePen, "title": "Edit Batch", "onTap": () {}},
     ];
 
     return Column(

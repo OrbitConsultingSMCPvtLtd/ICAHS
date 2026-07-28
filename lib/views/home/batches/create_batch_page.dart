@@ -200,7 +200,6 @@ class _CreateBatchPageState extends State<CreateBatchPage> {
             trailing: trailing,
             readOnly: readOnly,
             onTap: onTap,
-            // icon: Icon(Icons.person_rounded, color: MyColorPalette.textGrey),
           ),
         ],
       ),

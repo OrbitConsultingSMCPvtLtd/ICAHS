@@ -65,7 +65,6 @@ class _BottomNavPageState extends State<BottomNavPage> {
               labelTextStyle: WidgetStatePropertyAll(
                 TextStyle(
                   color: MyColorPalette.darkPurple,
-                  // fontWeight: FontWeight.bold,
                 ),
               ),
               destinations: const [
