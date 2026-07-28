@@ -3,7 +3,7 @@ description: "Official HWR App of Our College Management System"
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1 # android
+version: 1.0.0+2 # android
 # version: 1.0.0+1  ios
 
 environment:
