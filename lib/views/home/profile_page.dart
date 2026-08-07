@@ -44,10 +44,18 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final heightFactor = Theme.of(context).platform == TargetPlatform.android ? 2.5 : 3 ;
+    final heightFactor = Theme.of(context).platform == TargetPlatform.android
+        ? 2.5
+        : 3;
+    final heightBehindNavBar =
+        Theme.of(context).platform == TargetPlatform.android
+        ? kBottomNavigationBarHeight + 25
+        : kBottomNavigationBarHeight * 2;
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(MediaQuery.heightOf(context) / heightFactor),
+        preferredSize: Size.fromHeight(
+          MediaQuery.heightOf(context) / heightFactor,
+        ),
         child: Container(
           width: double.infinity,
           height: double.infinity,
@@ -217,7 +225,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 onTap: _handleLogout,
               ),
 
-              const SizedBox(height: kBottomNavigationBarHeight + 25),
+              SizedBox(height: heightBehindNavBar),
             ],
           ),
         ),
