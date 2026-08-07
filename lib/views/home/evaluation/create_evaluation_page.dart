@@ -904,30 +904,14 @@ class _CreateEvaluationPageState extends State<CreateEvaluationPage> {
               children: [
                 Expanded(
                   flex: 2,
-                  child: Stack(
-                    fit: StackFit.passthrough,
-                    children: [
-                      Text(
-                        "Score (1 ~ 5)",
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: MyColorPalette.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Positioned(
-                        top: 0,
-                        right: 20,
-                        child: Text(
-                          "*",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: MyColorPalette.red,
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    "Score (1 ~ 5)",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: MyColorPalette.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 Expanded(
