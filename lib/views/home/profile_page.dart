@@ -44,9 +44,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final heightFactor = Theme.of(context).platform == TargetPlatform.android ? 2.5 : 3 ;
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(MediaQuery.heightOf(context) / 2.5),
+        preferredSize: Size.fromHeight(MediaQuery.heightOf(context) / heightFactor),
         child: Container(
           width: double.infinity,
           height: double.infinity,
